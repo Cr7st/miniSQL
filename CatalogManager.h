@@ -16,7 +16,6 @@ class DataBaseClass{
 protected:
     DataType type;
     union Data data;
-
     friend std::ostream& operator<<(std::ostream &out, const DataBaseClass &obj);
     friend class Tuple;
 };
@@ -62,7 +61,7 @@ private:
  */
 class TableInfo{
 private:
-    std::vector<int> PK_index;
+    std::vector<int> PK_indices;
     std::vector<int> index_on;
     std::vector<ColumnInfo> columns;
 
@@ -95,6 +94,8 @@ public:
 
 class CM{ //short for CatalogManager
 public:
+    TableInfo InitTableInfo(std::string column_names[], std::string data_types[], int PK_index);
+    bool NewInfoCheck(TableInfo table);
     bool CreateTable(TableInfo table);
     bool SetIndexOn(std::string column_name);
 };

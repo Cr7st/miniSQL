@@ -4,6 +4,7 @@
 #include <vector>
 #include "CatalogManager.h"
 #include "Buffer.h"
+#include "Interpreter.h"
 
 class Tuple{
 protected:
@@ -43,7 +44,7 @@ public:
 };
 
 class RM{ //short for RecordManager
-
+    void SelectTuples(std::vector<Tuple> &tuples, std::vector<SelectCondition> conditions);
 };
 
 #endif

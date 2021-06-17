@@ -18,9 +18,10 @@ int main(){
     tb.columns.push_back(i);
     tb.columns.push_back(f);
     tb.columns.push_back(s);
-    Tuple t = Tuple(tb);
+    Tuple *t = new Tuple(tb);
     void* ptr = malloc(4096);
-    t.WriteTo(ptr);
+    t->WriteTo(ptr);
+    delete t;
     Tuple p(tb);
     p.ReadFrom(ptr);
     return 0;
