@@ -5,8 +5,24 @@
 具体应该是哪个block由BufferManager控制（文件头当中应该记录了上次写到第几个block的哪个位置了）
 
 > 取到的这个block里同样也告诉我上次写到这个block的哪个位置（应该可以由block的首地址加上已写字节数算出来）以及这个block还剩多少字节。
+
 >
-> 我拿到这个block之后，先把他pin锁住，确保我在操作的时候不会同时被其他人操作，导致我要写的位置变了（虽然我们应该不存在并发，走个形式），
+我拿到这个block之后，先把他pin锁住，确保我在操作的时候不会同时被其他人操作，导致我要写的位置变了（虽然我们应该不存在并发，走个形式），
+
+关于 pin 存在于block head 里面，相关定义为
+
+```c++
+class BlockHead
+{
+public:
+	void Initialize();		//初始化为第一个block
+	unsigned long blockID;	//block id
+	bool isPinned;			//是否为常驻内存
+};
+```
+
+
+
 >
 > 然后比较一下block剩下的空间够不够写下我这一条新记录，
 >

@@ -31,10 +31,10 @@ constexpr int MAX_FILENAME_LEN = 256;                   // 文件名（包含路
 const unsigned int FILEHI_RESERVE_SPACE = 512;			// 文件头预留空间
 
 class Clock;
-class BUFFER;
+class BufferManager;
 
 Clock* GetGlobalClock();
-BUFFER& GetGlobalFileBuffer();
+BufferManager& GetGlobalFileBuffer();
 
 
 
@@ -46,7 +46,7 @@ class BlockHead
 public:
 	void Initialize();		//初始化为第一个block
 	unsigned long blockID;	//block id
-	bool isFixed;			//是否为常驻内存
+	bool isPinned;			//是否为常驻内存
 };
 
 /**************************
@@ -100,17 +100,16 @@ class MemBlock
 {
 	friend class MemFile;
 	friend class Clock;
-	friend class BUFFER;
+	friend class BufferManager;
 public:
 	MemBlock();
 	~MemBlock();
 public:
 	unsigned long fileID;						//文件指针, fileID 为 0 时为被抛弃的页
 	unsigned long fileBlockID;					//文件页码
-
 	mutable bool isLastUsed;					//最近一次访问内存是否被使用，用于Clock算法
 	mutable bool isDirty;					//是否为脏页
-	mutable bool isPinned;						//是否被锁定
+	
 	void* PtrtoBlockBegin;						//实际保存物理文件数据的地址
 	BlockHead* blockHead;						//页头指针
 	FileHeadInfo* GetFileHeadInfo() const;		//文件头指针
@@ -119,8 +118,6 @@ private:
 	void BacktoFile() const;
 	//设置为修改过，即脏页
 	void SetModified();
-	//设置为被锁定
-	void SetPinned();
 };
 
 /*内存block管理类，管理内存block资源。
@@ -149,7 +146,7 @@ struct TB_Insert_Info
 class Clock
 {
 	friend class MemFile;
-	friend class BUFFER;
+	friend class BufferManager;
 	friend class BTree;
 	//缺如
 	friend bool InsertRecord(TB_Insert_Info tb_insert_info, std::string path /*= std::string("./")*/);
@@ -193,7 +190,7 @@ private:
 **************************/
 class MemFile
 {
-	friend class BUFFER;
+	friend class BufferManager;
 	friend class BTree;
 	friend bool DropTable(std::string table_name, std::string path);
 
@@ -235,14 +232,14 @@ private:
 };
 
 /*
-	Buffer, 通过调用 MemFile，实现对所有磁盘文件的读写
+	Buffer manager, 通过调用 MemFile，实现对所有磁盘文件的读写
 */
-class BUFFER
+class BufferManager
 {
 	friend bool DropTable(std::string table_name, std::string path);
 public:
-	BUFFER() = default;
-	~BUFFER();
+	BufferManager() = default;
+	~BufferManager();
 	//打开文件，打开失败返回 nullptr
 	MemFile* operator[](const char* fileName);					
 
