@@ -15,6 +15,7 @@
 
 #ifndef _BUFFER_H
 #define _BUFFER_H
+#include <string>
 #include<vector>
 #include<cassert>
 
@@ -24,6 +25,7 @@ extern "C" {
 }
 
 #define FileAddrSize (sizeof(FileAddr))
+#define MEM_PAGEAMOUNT 4096
 
 class Clock;
 class Buffer;
