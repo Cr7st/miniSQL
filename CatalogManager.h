@@ -44,7 +44,7 @@ public:
 };
 
 class ColumnInfo{
-public:
+private:
     std::string column_names;
     int bytes;
     DataType type;
@@ -56,12 +56,22 @@ public:
     friend class Tuple;
 };
 
+/**
+ * @brief: The class to store the information of a table,
+ *         which includes the primarykey, the columns info and on which column there is an index
+ */
 class TableInfo{
-public:
+private:
     std::vector<int> PK_index;
     std::vector<int> index_on;
     std::vector<ColumnInfo> columns;
 
+    /**
+     * @brief To write the essential information to the destination address
+     *        It should be written to the file head
+     * @param destination: The destination address of the memory
+     */
+    void WriteTo(void *destination);
 public:
     /**
      * @brief Get the number of columns/attributes of the table
@@ -75,12 +85,10 @@ public:
     int CalTupleSize() const;
 
     /**
-     * @brief To get the exact memory content of the data
-     * @param destination: The destination address of the memory
-     * @return Return the number of bytes required by all the data
+     * @brief To write the essential information to the file head
+     * @param file_head: the address of the file head block
      */
-    int GetWriteSource(void *destination);
-
+    void WriteToHead(void *file_head);
     friend class CatalogManager;
     friend class Tuple;
 };

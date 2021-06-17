@@ -23,7 +23,16 @@ public:
     void ReadFrom(void *source);
 public:
     ~Tuple();
+
+    /**
+     * @brief Initialize the tuple with the information of the table
+     *         What to initialize: number of attributes
+     *                             type of attributes
+     *                             the number of bytes needed to store this tuple
+     * @param info: The infomation of the table
+     */
     Tuple(TableInfo info);
+
     Tuple();
     /**
      * @brief Use WriteTo() to get the source content and write into the block
