@@ -3,7 +3,7 @@
 
 Tuple::Tuple(){}
 
-Tuple::Tuple(TableInfo info)
+Tuple::Tuple(TableInfo &info)
 {
     tuple_size = info.CalTupleSize();
     DataBaseClass *ptr;
@@ -30,28 +30,30 @@ Tuple::Tuple(TableInfo info)
 
 Tuple::~Tuple(){}
 
-void Tuple::WriteTo(void *destination)
+void* Tuple::GetWriteSource()
 {
+    void *source;
     int offset = 0;
     int temp_size;
     for (int i = 0; i < data_list.size(); i++){
         switch (data_list[i]->type){
             case DataType::INT:
                 temp_size = sizeof(int);
-                memcpy(destination + offset, &(data_list[i]->data.i), temp_size);
+                memcpy(source + offset, &(data_list[i]->data.i), temp_size);
                 break;
             case DataType::FLOAT:
                 temp_size = sizeof(double);
-                memcpy(destination + offset, &(data_list[i]->data.f), temp_size);
+                memcpy(source + offset, &(data_list[i]->data.f), temp_size);
                 break;
             case DataType::CHAR:
                 temp_size = sizeof(char) * ((CharData*)data_list[i])->get_length();
-                memcpy(destination + offset, (data_list[i]->data.str), temp_size);
+                memcpy(source + offset, (data_list[i]->data.str), temp_size);
                 break;
             default: break;
         }
         offset += temp_size;
     }
+    return source;
 }
 
 void Tuple::ReadFrom(void *source)

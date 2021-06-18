@@ -9,12 +9,12 @@ class Tuple{
 protected:
     std::vector<DataBaseClass*> data_list;
     int tuple_size;
-public:
+private:
     /**
-     * @brief To get the exact memory content of the data
-     * @param destination: The destination address of the memory
+     * @brief Patch all the data as the source
+     * @return return the address of the patched data source
      */
-    void WriteTo(void *destination);
+    void* GetWriteSource();
 
     /**
      * @brief To get the memory content of the source address
@@ -31,7 +31,9 @@ public:
      *                             the number of bytes needed to store this tuple
      * @param info: The infomation of the table
      */
-    Tuple(TableInfo info);
+    Tuple(TableInfo &info);
+
+    Tuple(TableInfo &Info, std::vector<DataBaseClass*> &list);
 
     Tuple();
     /**
