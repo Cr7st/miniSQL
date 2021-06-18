@@ -3,7 +3,6 @@
 
 #include <vector>
 #include "CatalogManager.h"
-#include "Buffer.h"
 #include "Interpreter.h"
 
 class Tuple{

@@ -1,4 +1,5 @@
 #include "CatalogManager.h"
+#include <string>
 #include <string.h>
 #include <vector>
 #include <iterator>
@@ -21,16 +22,19 @@ std::ostream& operator<<(std::ostream &out, const DataBaseClass &obj){
     return out;
 }
 
+
 //IntData::IntData() : DataType(DataType::INT){};
 IntData::IntData(int i){
     type = DataType::INT;
     data.i = i;
 };
 
+
 FloatData::FloatData(double f){
     type = DataType::FLOAT;
     data.f = f;
 };
+
 
 CharData::CharData(const char str[], int n){
     type = DataType::CHAR;
@@ -39,15 +43,18 @@ CharData::CharData(const char str[], int n){
     strcpy(data.str, str);
 };
 
+
 CharData::~CharData(){
     delete[] data.str;
 }
+
 
 CharData::CharData(){};
 
 int CharData::get_length() const{
     return length;
 }
+
 
 int TableInfo::CalTupleSize() const
 {
@@ -58,7 +65,49 @@ int TableInfo::CalTupleSize() const
     return size;
 }
 
+
 int TableInfo::n_columns() const
 {
     return columns.size();
+}
+
+
+bool CM::NewInfoCheck(TableInfo &table)
+{
+    for (int i = 0; i < table.n_columns(); i++){
+        for (int j = 0; j < table.n_columns(); j++){
+            if (i == j) continue;
+            else{
+                if (table.columns[i].column_name == table.columns[j].column_name)
+                    return false;
+            }
+        }
+    }
+    return true;
+}
+
+
+TableInfo& CM::InitTableInfo(std::vector<std::string> &column_names, std::vector<std::string> &data_types, int PK_index)
+{
+    TableInfo *table = new TableInfo;
+    for (int i = 0; i < column_names.size(); i++){
+        table->columns[i].has_index = false;
+        table->columns[i].column_name = column_names[i];
+        if (data_types[i] == "int"){
+            table->columns[i].type = DataType::INT;
+            table->columns[i].bytes = sizeof(int);
+        }
+        else if (data_types[i] == "float"){
+            table->columns[i].type = DataType::FLOAT;
+            table->columns[i].bytes = sizeof(double);
+        }
+        else if (data_types[i].substr(0, 4) == "char"){
+            table->columns[i].type = DataType::CHAR;
+            std::string str_size = data_types[i].substr(4, data_types[i].length() - 4);
+            table->columns[i].bytes = atoi(str_size.c_str()) * sizeof(char);
+        }
+    }
+    if (PK_index != -1) // this table has an primary key
+        table->columns[PK_index].is_PK = true;
+    return *table;
 }

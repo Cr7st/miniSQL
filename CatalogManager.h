@@ -53,6 +53,7 @@ private:
     friend class TableInfo;
     friend class CatalogManager;
     friend class Tuple;
+    friend class CM;
 };
 
 /**
@@ -82,21 +83,16 @@ public:
      * @return the number of bytes
      */
     int CalTupleSize() const;
-
-    /**
-     * @brief To write the essential information to the file head
-     * @param file_head: the address of the file head block
-     */
-    void WriteToHead(void *file_head);
     friend class CatalogManager;
     friend class Tuple;
+    friend class CM;
 };
 
 class CM{ //short for CatalogManager
 public:
-    TableInfo InitTableInfo(std::string column_names[], std::string data_types[], int PK_index);
-    bool NewInfoCheck(TableInfo table);
-    bool CreateTable(TableInfo table);
+    TableInfo& InitTableInfo(std::vector<std::string> &column_names, std::vector<std::string> &data_types, int PK_index);
+    bool NewInfoCheck(TableInfo &table);
+    bool CreateTable(TableInfo &table);
     bool SetIndexOn(std::string column_name);
 };
 
