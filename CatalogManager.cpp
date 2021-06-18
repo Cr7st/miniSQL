@@ -1,4 +1,5 @@
 #include "CatalogManager.h"
+#include "./ERROR/Error.h"
 #include <string>
 #include <string.h>
 #include <vector>
@@ -74,12 +75,20 @@ int TableInfo::n_columns() const
 
 bool CM::NewInfoCheck(TableInfo &table)
 {
+    for (int i = 0; i < ex_tables.size(); i++){
+        if (table.table_name == ex_tables[i].table_name){
+            throw SQLError::TABLE_ERROR("There is already a table named " + table.table_name + "!");
+            return false;
+        }
+    }
     for (int i = 0; i < table.n_columns(); i++){
         for (int j = 0; j < table.n_columns(); j++){
             if (i == j) continue;
             else{
-                if (table.columns[i].column_name == table.columns[j].column_name)
+                if (table.columns[i].column_name == table.columns[j].column_name){
+                    throw SQLError::TABLE_ERROR("There is an name conflict between attributes!");
                     return false;
+                }
             }
         }
     }
@@ -87,12 +96,22 @@ bool CM::NewInfoCheck(TableInfo &table)
 }
 
 
-TableInfo& CM::InitTableInfo(std::vector<std::string> &column_names, std::vector<std::string> &data_types, int PK_index)
+TableInfo& CM::InitTableInfo(std::string table_name, std::vector<std::string> &column_names, 
+                             std::vector<std::string> &data_types, int PK_index)
 {
     TableInfo *table = new TableInfo;
+    table->table_name = table_name;
     for (int i = 0; i < column_names.size(); i++){
         table->columns[i].has_index = false;
         table->columns[i].column_name = column_names[i];
+        if (data_types[i].find("unique") != data_types[i].npos){
+            table->columns[i].is_unique = true;
+            // discard the prefix "unique"
+            data_types[i] = data_types[i].substr(6, data_types[i].length() - 6);
+        }
+        else{
+            table->columns[i].is_unique = false;
+        }
         if (data_types[i] == "int"){
             table->columns[i].type = DataType::INT;
             table->columns[i].bytes = sizeof(int);
@@ -103,6 +122,7 @@ TableInfo& CM::InitTableInfo(std::vector<std::string> &column_names, std::vector
         }
         else if (data_types[i].substr(0, 4) == "char"){
             table->columns[i].type = DataType::CHAR;
+            // get the length of char
             std::string str_size = data_types[i].substr(4, data_types[i].length() - 4);
             table->columns[i].bytes = atoi(str_size.c_str()) * sizeof(char);
         }

@@ -44,10 +44,11 @@ public:
 
 class ColumnInfo{
 private:
-    std::string column_names;
+    std::string column_name;
     int bytes;
     DataType type;
     bool is_PK;
+    bool is_unique;
     bool has_index;
 
     friend class TableInfo;
@@ -65,6 +66,7 @@ private:
     std::vector<int> PK_indices;
     std::vector<int> index_on;
     std::vector<ColumnInfo> columns;
+    std::string table_name;
 
     /**
      * @brief To write the essential information to the destination address
@@ -89,11 +91,35 @@ public:
 };
 
 class CM{ //short for CatalogManager
+private:
+    std::vector<TableInfo> ex_tables; // the info of all the existing tables in the database
 public:
-    TableInfo& InitTableInfo(std::vector<std::string> &column_names, std::vector<std::string> &data_types, int PK_index);
+    /**
+     * @brief Initialize an TableInfo object with the information given from interpreter
+     * @param column_names: the names of all the columns
+     * @param data_types: the declaration of the types of the columns
+     *                    should be in the format of:
+     *                    "uniqueint"
+     *                    "uniqueflota"
+     *                    "uniquechar..." here "..." is the length, in number
+     *                    prefix unique is only needed when the column is declared to be unique
+     * @return return the reference of the initialized TableInfo
+     */
+    TableInfo& InitTableInfo(std::string table_name, std::vector<std::string> &column_names, 
+                             std::vector<std::string> &data_types, int PK_index);
+
+    /**
+     * @brief What to check:
+     *          - If there are columns have the same name
+     *          - If the table of this table_name has already exist
+     * @return If the TableInfo is legal, return true, else throw an error
+     */
     bool NewInfoCheck(TableInfo &table);
+
+    TableInfo& LookUpTableInfo(std::string name);
+
     bool CreateTable(TableInfo &table);
-    bool SetIndexOn(std::string column_name);
+    //bool SetIndexOn(std::string table_name, std::string column_name);
 };
 
 #endif
