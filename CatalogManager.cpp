@@ -5,7 +5,7 @@
 #include <vector>
 #include <iterator>
 
-std::ostream& operator<<(std::ostream &out, const DataBaseClass &obj){
+std::ostream& operator<<(std::ostream &out, const DataClass &obj){
     switch (obj.type)
     {
     case DataType::INT:
@@ -25,37 +25,28 @@ std::ostream& operator<<(std::ostream &out, const DataBaseClass &obj){
 
 
 //IntData::IntData() : DataType(DataType::INT){};
-IntData::IntData(int i){
+DataClass::DataClass(){}
+
+DataClass::DataClass(int i){
     type = DataType::INT;
     data.i = i;
-};
+    bytes = 4;
+}
 
 
-FloatData::FloatData(double f){
+DataClass::DataClass(double f){
     type = DataType::FLOAT;
     data.f = f;
-};
+    bytes = 8;
+}
 
 
-CharData::CharData(const char str[], int n){
+DataClass::DataClass(std::string str){
     type = DataType::CHAR;
-    length = n;
-    data.str = new char[n+1];
-    strcpy(data.str, str);
-};
-
-
-CharData::~CharData(){
-    delete[] data.str;
+    bytes = str.length();
+    data.str = new char[bytes+1];
+    strcpy(data.str, str.c_str());
 }
-
-
-CharData::CharData(){};
-
-int CharData::get_length() const{
-    return length;
-}
-
 
 int TableInfo::CalTupleSize() const
 {
@@ -101,6 +92,10 @@ bool CM::NewInfoCheck(TableInfo &table)
 TableInfo CM::InitTableInfo(std::string table_name, std::vector<std::string> &column_names, 
                              std::vector<std::string> &data_types, int PK_index)
 {
+    if (column_names.size() > 15){
+        std::string e("To many attributes!");
+        throw SQLError::TABLE_ERROR(e);
+    }
     TableInfo table;
     table.table_name = table_name;
     for (int i = 0; i < column_names.size(); i++){
@@ -243,11 +238,29 @@ void TableInfo::ReadFrom(void *source)
     int n_col;
     memcpy(&n_col, (char*)source + 28, 4);
     int attr_info;
+    int data_type;
+    char *source_i = (char*)source;
     for (int i = 0; i < n_col; i++){
-        memcpy(&attr_info, source, 4);
-        switch (attr_info){
-            case 0:
-                ;
+        source_i = source_i + 32;
+        memcpy(&attr_info, source_i, 4);
+        columns[i].is_PK = attr_info & 1;
+        columns[i].is_unique = attr_info & 2;
+        columns[i].has_index = attr_info & 4;
+        memcpy(&data_type, source_i + 4, 4);
+        switch (data_type){
+            case 1:
+                columns[i].type = DataType::INT;
+                break;
+            case 2:
+                columns[i].type = DataType::FLOAT;
+                break;
+            case 3:
+                columns[i].type = DataType::CHAR;
+                break;
+            default: break;
         }
+        memcpy(&(columns[i].bytes), source_i + 8, 4);
+        memcpy(name, source_i + 12, 20);
+        columns[i].column_name = std::string(name);
     }
 }

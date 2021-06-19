@@ -8,7 +8,7 @@
 
 class Tuple{
 protected:
-    std::vector<DataBaseClass*> data_list;
+    std::vector<DataClass> data_list;
     int tuple_size;
 private:
     /**
@@ -34,7 +34,7 @@ public:
      */
     Tuple(TableInfo &info);
 
-    Tuple(TableInfo &Info, std::vector<DataBaseClass*> &list);
+    Tuple(TableInfo &Info, std::vector<DataClass> &list);
 
     Tuple();
     /**

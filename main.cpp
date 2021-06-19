@@ -10,20 +10,15 @@ public:
 };
 
 std::vector<struct S> obj;
-struct S f(){
-    struct S s1,s2,s3;
-    s1.i = 1;
-    s2.i = 2;
-    s3.i = 3;
-    obj.push_back(s1);
-    obj.push_back(s2);
-    obj.push_back(s3);
-    return s1;
-}
 
 int main(){
-    std::cout << f().i << std::endl;
+    for (int i = 0; i < 4; i++){
+        struct S s;
+        s.i = i;
+        obj.push_back(s);
+    }
     std::cout << obj.size() << std::endl;
-    std::cout << obj.at(1).i << std::endl;
-    std::cout << obj.at(2).i << std::endl;
+    for (int i = 0; i < 4; i++){
+        std::cout << obj[i].i << std::endl;
+    }
 }

@@ -12,35 +12,41 @@ union Data{
     char *str;
 };
 
-class DataBaseClass{
-protected:
+class DataClass{
+private:
     DataType type;
+    int bytes;
     union Data data;
-    friend std::ostream& operator<<(std::ostream &out, const DataBaseClass &obj);
+public:
+    DataClass();
+    DataClass(int i);
+    DataClass(double f);
+    DataClass(std::string str);
+    friend std::ostream& operator<<(std::ostream &out, const DataClass &obj);
     friend class Tuple;
 };
 
-class IntData: public DataBaseClass{
-public:
-    //IntData();
-    IntData(int i = 0);
-};
+// class IntData: public DataClass{
+// public:
+//     //IntData();
+//     IntData(int i = 0);
+// };
 
-class FloatData: public DataBaseClass{
-public:
-    //FloatData();
-    FloatData(double f = 0);
-};
+// class FloatData: public DataClass{
+// public:
+//     //FloatData();
+//     FloatData(double f = 0);
+// };
 
-class CharData: public DataBaseClass{
-private:
-    int length;
-public:
-    int get_length() const;
-    CharData();
-    CharData(const char str[], int n = 1);
-    ~CharData();
-};
+// class CharData: public DataClass{
+// private:
+//     int length;
+// public:
+//     int get_length() const;
+//     CharData();
+//     CharData(const char str[], int n = 1);
+//     ~CharData();
+// };
 
 class ColumnInfo{
 private:
