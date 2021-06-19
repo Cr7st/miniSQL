@@ -57,6 +57,12 @@ private:
     friend class CM;
 };
 
+struct TableInfoMem{
+    char name[28];
+    char n_col[4];
+    char columns_info[32 * 15];
+};
+
 /**
  * @brief: The class to store the information of a table,
  *         which includes the primarykey, the columns info and on which column there is an index
@@ -74,6 +80,10 @@ private:
      * @param destination: The destination address of the memory
      */
     void WriteTo(void *destination);
+
+    struct TableInfoMem* GetPatchedData();
+
+    void ReadFrom(void *source);
 public:
     /**
      * @brief Get the number of columns/attributes of the table
@@ -85,6 +95,8 @@ public:
      * @return the number of bytes
      */
     int CalTupleSize() const;
+
+    bool SetIdxOn(int index);
     friend class CatalogManager;
     friend class Tuple;
     friend class CM;
@@ -92,8 +104,8 @@ public:
 
 class CM{ //short for CatalogManager
 private:
-    std::vector<TableInfo> ex_tables; // the info of all the existing tables in the database
-public:
+    std::vector<TableInfo> ex_tables; // the info of tables now exit in the memory
+public: 
     /**
      * @brief Initialize an TableInfo object with the information given from interpreter
      * @param column_names: the names of all the columns
@@ -105,13 +117,12 @@ public:
      *                    prefix unique is only needed when the column is declared to be unique
      * @return return the reference of the initialized TableInfo
      */
-    TableInfo& InitTableInfo(std::string table_name, std::vector<std::string> &column_names, 
+    TableInfo InitTableInfo(std::string table_name, std::vector<std::string> &column_names, 
                              std::vector<std::string> &data_types, int PK_index);
 
     /**
      * @brief What to check:
      *          - If there are columns have the same name
-     *          - If the table of this table_name has already exist
      * @return If the TableInfo is legal, return true, else throw an error
      */
     bool NewInfoCheck(TableInfo &table);
@@ -120,6 +131,12 @@ public:
 
     bool CreateTable(TableInfo &table);
     //bool SetIndexOn(std::string table_name, std::string column_name);
+    bool SetIdxOn(TableInfo &table, int index);
+
+    void OpenTableFile(TableInfo &table);
+
+    void CloseTable(std::string name);
+    void CloseTable(TableInfo &table);
 };
 
 #endif

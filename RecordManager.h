@@ -4,6 +4,7 @@
 #include <vector>
 #include "CatalogManager.h"
 #include "Interpreter.h"
+#include "bufferManager.h"
 
 class Tuple{
 protected:
@@ -42,10 +43,17 @@ public:
      * @param block: The destination block
      */
     //void WriteToBlock(Block block);
+    friend class RM;
 };
 
 class RM{ //short for RecordManager
-    void SelectTuples(std::vector<Tuple> &tuples, std::vector<SelectCondition> conditions);
+private:
+    std::vector<Tuple> select_rs;
+
+    bool Satisfy(SelectCondition &condition, Tuple &tuple);
+public:
+    void SelectTuple(std::vector<SelectCondition> &conditions, void* source, TableInfo info);
+    void GetSelectRS(std::vector<Tuple> result);
 };
 
 #endif

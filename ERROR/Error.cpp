@@ -3,20 +3,15 @@
 
 namespace SQLError
 {
-	static std::fstream log_file;
 
 	void BaseError::PrintError() const
 	{
-		// Êä³öÒì³£
+		// ï¿½ï¿½ï¿½ï¿½ì³£
 		std::cout << ErrorInfo;
 	}
 
 	void BaseError::WriteToLog()const
 	{
-		// Ð´ÈëÈÕÖ¾
-		log_file.open("log", std::ios::out | std::ios::app);
-		log_file << ErrorInfo << std::endl;
-		log_file.close();
 	}
 
 	CMD_FORMAT_ERROR::CMD_FORMAT_ERROR(const std::string s)
@@ -27,7 +22,7 @@ namespace SQLError
 
 	void CMD_FORMAT_ERROR::PrintError() const
 	{
-		// Êä³öÒì³£
+		// ï¿½ï¿½ï¿½ï¿½ì³£
 		std::cout << error_info << ErrorInfo;
 	}
 	void SQLError::TABLE_ERROR::PrintError() const
