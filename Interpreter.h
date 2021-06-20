@@ -7,6 +7,6 @@ class SelectCondition{
 private:
     std::string on_attr;
     std::string op;
-    Data cmp_value;
+    DataClass cmp_value;
     friend class RM;
 };

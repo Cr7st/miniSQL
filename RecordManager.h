@@ -6,6 +6,31 @@
 #include "Interpreter.h"
 #include "bufferManager.h"
 
+union Data{
+    int i;
+    double f;
+    char *str;
+};
+
+class DataClass{
+private:
+    DataType type;
+    int bytes;
+    union Data data;
+public:
+    DataClass();
+    DataClass(int i);
+    DataClass(double f);
+    DataClass(std::string str);
+    bool operator==(const DataClass &rhs);
+    bool operator<(const DataClass &rhs);
+    bool operator<=(const DataClass &rhs);
+    bool operator>=(const DataClass &rhs);
+    bool operator>(const DataClass &rhs);
+    friend std::ostream& operator<<(std::ostream &out, const DataClass &obj);
+    friend class Tuple;
+};
+
 class Tuple{
 protected:
     std::vector<DataClass> data_list;
@@ -50,10 +75,13 @@ class RM{ //short for RecordManager
 private:
     std::vector<Tuple> select_rs;
 
-    bool Satisfy(SelectCondition &condition, Tuple &tuple);
+    bool Satisfy(SelectCondition &condition, Tuple &tuple, const TableInfo &info);
 public:
-    void SelectTuple(std::vector<SelectCondition> &conditions, void* source, TableInfo info);
-    void GetSelectRS(std::vector<Tuple> result);
+    void SelectTuple(std::vector<SelectCondition> &conditions, void* source, TableInfo &info);
+    void GetSelectRS(std::vector<Tuple> &result);
+    void InsertTuple(void *destination, TableInfo &table, std::vector<DataClass> &list);
+    bool InsertCheck(void *source, TableInfo &table, std::vector<DataClass> &list);
+    bool DeleteCheck(std::vector<SelectCondition> &conditions, void *source, TableInfo &info);
 };
 
 #endif

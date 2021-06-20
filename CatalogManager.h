@@ -6,26 +6,6 @@
 
 enum class DataType{INT, FLOAT, CHAR};
 
-union Data{
-    int i;
-    double f;
-    char *str;
-};
-
-class DataClass{
-private:
-    DataType type;
-    int bytes;
-    union Data data;
-public:
-    DataClass();
-    DataClass(int i);
-    DataClass(double f);
-    DataClass(std::string str);
-    friend std::ostream& operator<<(std::ostream &out, const DataClass &obj);
-    friend class Tuple;
-};
-
 // class IntData: public DataClass{
 // public:
 //     //IntData();
@@ -61,6 +41,7 @@ private:
     friend class CatalogManager;
     friend class Tuple;
     friend class CM;
+    friend class RM;
 };
 
 struct TableInfoMem{
@@ -75,7 +56,7 @@ struct TableInfoMem{
  */
 class TableInfo{
 private:
-    std::vector<int> PK_indices;
+    int PK_index;
     std::vector<int> index_on;
     std::vector<ColumnInfo> columns;
     std::string table_name;
@@ -106,6 +87,7 @@ public:
     friend class CatalogManager;
     friend class Tuple;
     friend class CM;
+    friend class RM;
 };
 
 class CM{ //short for CatalogManager
@@ -137,7 +119,7 @@ public:
 
     bool CreateTable(TableInfo &table);
     //bool SetIndexOn(std::string table_name, std::string column_name);
-    bool SetIdxOn(TableInfo &table, int index);
+    bool SetIdxOn(TableInfo &table, int index, void *destination);
 
     void OpenTableFile(TableInfo &table);
 

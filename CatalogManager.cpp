@@ -5,49 +5,6 @@
 #include <vector>
 #include <iterator>
 
-std::ostream& operator<<(std::ostream &out, const DataClass &obj){
-    switch (obj.type)
-    {
-    case DataType::INT:
-        out << obj.data.i;
-        break;
-    case DataType::FLOAT:
-        out << obj.data.f;
-        break;
-    case DataType::CHAR:
-        out << obj.data.str;
-        break;
-    default:
-        break;
-    }
-    return out;
-}
-
-
-//IntData::IntData() : DataType(DataType::INT){};
-DataClass::DataClass(){}
-
-DataClass::DataClass(int i){
-    type = DataType::INT;
-    data.i = i;
-    bytes = 4;
-}
-
-
-DataClass::DataClass(double f){
-    type = DataType::FLOAT;
-    data.f = f;
-    bytes = 8;
-}
-
-
-DataClass::DataClass(std::string str){
-    type = DataType::CHAR;
-    bytes = str.length();
-    data.str = new char[bytes+1];
-    strcpy(data.str, str.c_str());
-}
-
 int TableInfo::CalTupleSize() const
 {
     int size = 0;
@@ -97,10 +54,17 @@ TableInfo CM::InitTableInfo(std::string table_name, std::vector<std::string> &co
         throw SQLError::TABLE_ERROR(e);
     }
     TableInfo table;
+    if (table_name.length() >= 27){
+        std::string e("Table name is too long!");
+        throw SQLError::TABLE_ERROR(e);
+    }
     table.table_name = table_name;
     for (int i = 0; i < column_names.size(); i++){
         ColumnInfo column;
         column.has_index = false;
+        if (column_names[i].length() >= 19){
+            throw SQLError::KeyAttr_NameLength_ERROR();
+        }
         column.column_name = column_names[i];
         if (data_types[i].find("unique") != data_types[i].npos){
             column.is_unique = true;
@@ -126,8 +90,10 @@ TableInfo CM::InitTableInfo(std::string table_name, std::vector<std::string> &co
         }
         table.columns.push_back(column);
     }
-    if (PK_index != -1) // this table has an primary key
-        table.columns[PK_index].is_PK = true;
+    table.columns[PK_index].is_PK = true;
+    table.columns[PK_index].has_index = true;
+    table.index_on.push_back(PK_index);
+    table.PK_index = PK_index;
     return table;
 }
 
@@ -143,9 +109,12 @@ TableInfo& CM::LookUpTableInfo(std::string name)
 }
 
 
-bool CM::SetIdxOn(TableInfo &table, int index)
+bool CM::SetIdxOn(TableInfo &table, int index, void *destination)
 {
-    return table.SetIdxOn(index);
+    if (table.SetIdxOn(index)){
+        table.WriteTo(destination);
+    }
+    else return false;
 }
 
 
