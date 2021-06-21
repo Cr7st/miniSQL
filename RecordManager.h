@@ -60,7 +60,7 @@ private:
 
     bool Satisfy(SelectCondition &condition, Tuple &tuple, const TableInfo &info);
 public:
-    void SelectTuple(std::vector<SelectCondition> &conditions, void* source, TableInfo &info);
+    void SelectTuple(std::vector<SelectCondition> &conditions, const void* source, TableInfo &info);
     void GetSelectRS(std::vector<Tuple> &result);
     void InsertTuple(void *destination, TableInfo &table, std::vector<DataClass> &list);
     void* GetSource(Tuple *t);

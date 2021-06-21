@@ -116,7 +116,7 @@ void Tuple::ReadFrom(const void *source)
 }
 
 
-void RM::SelectTuple(std::vector<SelectCondition> &conditions, void* source, TableInfo &info)
+void RM::SelectTuple(std::vector<SelectCondition> &conditions, const void* source, TableInfo &info)
 {
     Tuple tuple(info);
     tuple.ReadFrom(source);
