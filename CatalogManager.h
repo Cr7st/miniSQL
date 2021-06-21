@@ -84,6 +84,8 @@ public:
     int CalTupleSize() const;
 
     bool SetIdxOn(int index);
+
+    friend class FileHeadInfo;
     friend class CatalogManager;
     friend class Tuple;
     friend class CM;
@@ -117,13 +119,13 @@ public:
 
     TableInfo& LookUpTableInfo(std::string name);
 
-    bool CreateTable(TableInfo &table);
+    void CreateTable(TableInfo &table, void *destination);
     //bool SetIndexOn(std::string table_name, std::string column_name);
     bool SetIdxOn(TableInfo &table, int index, void *destination);
 
     bool DropTable(std::string name);
 
-    void OpenTableFile(TableInfo &table);
+    void OpenTableFile(void *source);
 
     void CloseTable(std::string name);
     void CloseTable(TableInfo &table);

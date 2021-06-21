@@ -62,6 +62,8 @@ TableInfo CM::InitTableInfo(std::string table_name, std::vector<std::string> &co
     for (int i = 0; i < column_names.size(); i++){
         ColumnInfo column;
         column.has_index = false;
+        column.is_PK = false;
+        column.is_unique = false;
         if (column_names[i].length() >= 19){
             throw SQLError::KeyAttr_NameLength_ERROR();
         }
@@ -97,6 +99,10 @@ TableInfo CM::InitTableInfo(std::string table_name, std::vector<std::string> &co
     return table;
 }
 
+void CM::CreateTable(TableInfo &table, void *destination)
+{
+    table.WriteTo(destination);
+}
 
 TableInfo& CM::LookUpTableInfo(std::string name)
 {
@@ -130,9 +136,11 @@ bool TableInfo::SetIdxOn(int index)
 }
 
 
-void CM::OpenTableFile(TableInfo &table)
+void CM::OpenTableFile(void *source)
 {
-    ex_tables.push_back(table);
+    TableInfo n;
+    n.ReadFrom(source);
+    ex_tables.push_back(n);
 }
 
 
@@ -168,10 +176,10 @@ struct TableInfoMem* TableInfo::GetPatchedData()
     res->name[i] = '\0';
     i = n_columns();
     memcpy(res->n_col, &i, 4);
-    int attr_info = 0;
     char* dest_addr;
     int data_type;
     for (i = 0; i < columns.size(); i++){
+        int attr_info = 0;
         if (columns[i].is_PK)
             attr_info = attr_info | 0b001;
         if (columns[i].is_unique)
@@ -197,8 +205,8 @@ struct TableInfoMem* TableInfo::GetPatchedData()
         dest_addr += 4;
         memcpy(dest_addr, &(columns[i].bytes), 4);
         dest_addr += 4;
-        for (int j = 0; j < table_name.length(); j++){
-            *dest_addr = table_name[i];
+        for (int j = 0; j < columns[i].column_name.length(); j++){
+            *dest_addr = columns[i].column_name[j];
             dest_addr++;
         }
         *dest_addr = '\0';
@@ -220,10 +228,13 @@ void TableInfo::ReadFrom(void *source)
     table_name = std::string(name);
     int n_col;
     memcpy(&n_col, (char*)source + 28, 4);
-    int attr_info;
-    int data_type;
+    int attr_info = 0;
+    int data_type = 0;
     char *source_i = (char*)source;
-    for (int i = 0; i < n_col; i++){
+    for (int i = 0; i < n_col; i++)
+    {
+        ColumnInfo column;
+        columns.push_back(column);
         source_i = source_i + 32;
         memcpy(&attr_info, source_i, 4);
         columns[i].is_PK = attr_info & 1;
