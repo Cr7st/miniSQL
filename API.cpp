@@ -90,7 +90,7 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
         std::vector<Tuple> result_set;
         for (int i = 0; i < conditions.size(); i++){
             for (int j = 0; j < table_info.n_columns(); j++){
-                if (table_info[j].column_name == conditions[i].on_attr){
+                if (table_info[j].column_name == conditions[i].attr){
                     if (table_info[j].has_index){
                         tree = BPTree(table_name + table_info[j].column_name);
                         found_index = true;
@@ -109,17 +109,17 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
                 break;
             }
         }
-        std::vector<FileAddr> addr_list;
+        std::vector<FileAddr*> addr_list;
         const void *cmp_src;
         if (found_index){
             if (conditions[idx_cond].op == "="){
-                addr_list = tree.Search(conditions[idx_cond].cmp_value);
+                addr_list = tree.Search(conditions[idx_cond].value);
             }
             else if (conditions[idx_cond].op == "<" && conditions[idx_cond].op == "<="){
-                addr_list = tree.LeftSearch(conditions[idx_cond].cmp_value);
+                addr_list = tree.LeftSearch(conditions[idx_cond].value);
             }
             else if (conditions[idx_cond].op == ">" && conditions[idx_cond].op == ">="){
-                addr_list = tree.LeftSearch(conditions[idx_cond].cmp_value);
+                addr_list = tree.LeftSearch(conditions[idx_cond].value);
             }
         }
         else{

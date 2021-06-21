@@ -50,7 +50,7 @@ void FileAddr::ShiftOffset(const int OFFSET)
 
 //FileHeadInfo
 
-void FileHeadInfo::Initialize()
+void FileHeadInfo::Initialize(TableInfo &info)
 {
 	totalBlock = 1;
 	FileAddr tmpFH;
@@ -59,7 +59,7 @@ void FileHeadInfo::Initialize()
 	lastDel = tmpFH;
 	tmpFH.offset = sizeof(BlockHead) + sizeof(FileHeadInfo);
 	NewInsert = tmpFH;
-	memset(reserve, 0, FILEHI_RESERVE_SPACE);
+	info.WriteTo(reserve);
 }
 
 //MemBlock
@@ -181,7 +181,7 @@ MemBlock* Clock::CreateNewBlock(unsigned long fileID, unsigned long fileBlockID)
 	else
 	{
 		MemBlocks[i]->blockHead->isPinned = 1;
-		MemBlocks[i]->GetFileHeadInfo()->Initialize();
+		MemBlocks[i]->blockHead->Initialize();
 	}
 	return MemBlocks[i];
 }
@@ -465,7 +465,7 @@ MemFile* BufferManager::GetMemFile(const char* fileName)
 	return nullptr;
 }
 
-void BufferManager::CreateFile(const char* fileName)
+void BufferManager::CreateFile(const char* fileName, TableInfo &info)
 {
 	// 文件存在 创建失败
 	int ptrtoFile = open(fileName, _O_BINARY | O_RDWR, 0664);
@@ -483,7 +483,7 @@ void BufferManager::CreateFile(const char* fileName)
 	FileHeadInfo* pFileHI = (FileHeadInfo*)((char*)ptr + sizeof(BlockHead));
 	pPageHead->blockID = 0;
 	pPageHead->isPinned = 1;
-	pFileHI->Initialize();
+	pFileHI->Initialize(info);
 	//写回
 	write(newFile, ptr, FILE_BLOCKSIZE);
 	close(newFile);
