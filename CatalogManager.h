@@ -121,6 +121,8 @@ public:
     //bool SetIndexOn(std::string table_name, std::string column_name);
     bool SetIdxOn(TableInfo &table, int index, void *destination);
 
+    bool DropTable(std::string name);
+
     void OpenTableFile(TableInfo &table);
 
     void CloseTable(std::string name);

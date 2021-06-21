@@ -139,9 +139,22 @@ void CM::OpenTableFile(TableInfo &table)
 void CM::CloseTable(std::string name)
 {
     for (auto vi = ex_tables.begin(); vi != ex_tables.end(); vi++){
-        if (vi->table_name == name)
+        if (vi->table_name == name){
             ex_tables.erase(vi);
+            break;
+        }
     }
+}
+
+bool CM::DropTable(std::string name)
+{
+    for (auto vi = ex_tables.begin(); vi != ex_tables.end(); vi++){
+        if (vi->table_name == name){
+            ex_tables.erase(vi);
+            return true;
+        }
+    }
+    return false;
 }
 
 
