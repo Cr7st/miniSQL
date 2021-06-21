@@ -1,5 +1,4 @@
 #include "RecordManager.h"
-#include <string>
 
 std::ostream& operator<<(std::ostream &out, const DataClass &obj){
     switch (obj.type)
@@ -60,6 +59,7 @@ bool DataClass::operator==(const DataClass &rhs)
         else return false;
         break;
     default:
+        return false;
         break;
     }
 }
@@ -68,19 +68,20 @@ bool DataClass::operator<(const DataClass &rhs)
 {
     switch (this->type)
     {
-    case DataType::INT:
-        return this->data.i < rhs.data.i;
-        break;
-    case DataType::FLOAT:
-        return this->data.f < rhs.data.f;
-        break;
-    case DataType::CHAR:
-        if (strcmp(this->data.str, rhs.data.str) < 0)
-            return true;
-        else return false;
-        break;
-    default:
-        break;
+        case DataType::INT:
+            return this->data.i < rhs.data.i;
+            break;
+        case DataType::FLOAT:
+            return this->data.f < rhs.data.f;
+            break;
+        case DataType::CHAR:
+            if (strcmp(this->data.str, rhs.data.str) < 0)
+                return true;
+            else return false;
+            break;
+        default:
+            return false;
+            break;
     }
 }
 bool DataClass::operator<=(const DataClass &rhs)
@@ -262,13 +263,19 @@ bool RM::InsertCheck(void *source, TableInfo &table, std::vector<DataClass> &lis
 {
     Tuple ex(table);
     ex.ReadFrom(source);
-    if (ex.data_list[table.PK_index] == list[table.PK_index]){
-        std::string e("Primary key conflict!");
-        throw SQLError::TABLE_ERROR(e);
-        return false;
+    for (int i = 0; i < table.n_columns(); i++){
+        if (ex.data_list[i].type != list[i].type){
+            throw SQLError::KEY_INSERT_ERROR();
+            return false;
+        }
+        else if (table.columns[i].is_unique || table.columns[i].is_PK){
+            if (ex.data_list[i] == list[i]){
+                throw SQLError::KEY_INSERT_ERROR();
+                return false;
+            }
+        }
     }
-    else
-        return true;
+    return true;
 }
 
 void RM::InsertTuple(void *destination, TableInfo &table, std::vector<DataClass> &list)

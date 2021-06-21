@@ -1,10 +1,11 @@
-#ifndef _RECORDMANAGER_H_
-#define _RECORDMANAGER_H_
-
-#include <vector>
+#ifndef __RECORDMANAGER_H__
+#define __RECORDMANAGER_H__
+#include "ERROR/Error.h"
 #include "CatalogManager.h"
 #include "Interpreter.h"
-#include "bufferManager.h"
+#include <vector>
+#include <string>
+#include <cstring>
 
 union Data{
     int i;
@@ -29,6 +30,13 @@ public:
     bool operator>(const DataClass &rhs);
     friend std::ostream& operator<<(std::ostream &out, const DataClass &obj);
     friend class Tuple;
+    friend class RM;
+};
+
+struct SelectCondition{
+    std::string on_attr;
+    std::string op;
+    DataClass cmp_value;
 };
 
 class Tuple{

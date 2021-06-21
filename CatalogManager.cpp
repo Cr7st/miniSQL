@@ -113,6 +113,7 @@ bool CM::SetIdxOn(TableInfo &table, int index, void *destination)
 {
     if (table.SetIdxOn(index)){
         table.WriteTo(destination);
+        return true;
     }
     else return false;
 }

@@ -1,8 +1,8 @@
-#include <vector>
-#include <iostream>
-#include "RecordManager.h"
 #ifndef _CATALOGMANAGER_H_
 #define _CATALOGMANAGER_H_
+
+#include <vector>
+#include <iostream>
 
 enum class DataType{INT, FLOAT, CHAR};
 
