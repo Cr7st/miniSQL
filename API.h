@@ -7,6 +7,7 @@
 #include "RecordManager.h"
 #include "bufferManager.h"
 #include "bpt.h"
+#include "GlobalClass.h"
 #include "ERROR/Error.h"
 
 void CreateTable(std::string table_name, std::vector<std::string> &column_names, 

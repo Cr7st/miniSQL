@@ -30,15 +30,28 @@ bool InsertTuple(std::string table_name, std::vector<DataClass> &list)
     std::string table_file_name = table_name + ".db";
     MemFile *file = bufferManager[table_file_name.c_str()];
     TableInfo &info = CatalogManager.LookUpTableInfo(table_name);
-    FileAddr file_addr;
-    file_addr.SetFileAddr(1, 0);
-    for (int i = 0; i < 10; i++){
-        const void *cmp_src = file->ReadRecord(&file_addr);
-        if (!RecordManager.InsertCheck(cmp_src, info, list)){
-            throw SQLError::KEY_INSERT_ERROR();
-            return false;
+    for (int i = 0; i < info.n_columns(); i++){
+        if (info[i].is_unique || info[i].is_PK){
+            if (info[i].is_PK){
+                bpt tree(table_name);
+                if (!tree.Search(list[i]))
+                    throw SQLError::KEY_INSERT_ERROR();
+            }
+            else if (info[i].has_index){
+                bpt tree(table_name + info[i].column_name);
+                if (!tree.Search(list[i]))
+                    throw SQLError::KEY_INSERT_ERROR();
+            }            
+            else{
+                bpt tree(table_name);
+                std::vector<FileAddr*> addr_list = tree.AllSearch();
+                for (int j = 0; j < addr_list.size(); j++){
+                    const void *cmp_src = file->ReadRecord(addr_list[j]);
+                    if (!RecordManager.InsertCheck(cmp_src, info, list))
+                        throw SQLError::KEY_INSERT_ERROR();
+                }
+            }
         }
-        file_addr.ShiftOffset(info.CalTupleSize());
     }
     Tuple t(info, list);
     void *p = RecordManager.GetSource(&t);

@@ -3,8 +3,7 @@
 
 #include <vector>
 #include <iostream>
-
-enum class DataType{INT, FLOAT, CHAR};
+#include "GlobalClass.h"
 
 // class IntData: public DataClass{
 // public:
@@ -28,20 +27,14 @@ enum class DataType{INT, FLOAT, CHAR};
 //     ~CharData();
 // };
 
-class ColumnInfo{
-private:
+struct ColumnInfo{
+public:
     std::string column_name;
     int bytes;
     DataType type;
     bool is_PK;
     bool is_unique;
     bool has_index;
-
-    friend class TableInfo;
-    friend class CatalogManager;
-    friend class Tuple;
-    friend class CM;
-    friend class RM;
 };
 
 struct TableInfoMem{
@@ -84,6 +77,8 @@ public:
     int CalTupleSize() const;
 
     bool SetIdxOn(int index);
+
+    ColumnInfo operator[](int idx) const; 
 
     friend class FileHeadInfo;
     friend class CatalogManager;

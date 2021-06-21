@@ -165,6 +165,10 @@ bool CM::DropTable(std::string name)
     return false;
 }
 
+ColumnInfo TableInfo::operator[](int idx) const
+{
+    return columns.at(idx);
+}
 
 struct TableInfoMem* TableInfo::GetPatchedData()
 {

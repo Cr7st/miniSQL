@@ -3,35 +3,10 @@
 #include "ERROR/Error.h"
 #include "CatalogManager.h"
 #include "Interpreter.h"
+#include "GlobalClass.h"
 #include <vector>
 #include <string>
 #include <cstring>
-
-union Data{
-    int i;
-    double f;
-    char *str;
-};
-
-class DataClass{
-private:
-    DataType type;
-    int bytes;
-    union Data data;
-public:
-    DataClass();
-    DataClass(int i);
-    DataClass(double f);
-    DataClass(std::string str);
-    bool operator==(const DataClass &rhs);
-    bool operator<(const DataClass &rhs);
-    bool operator<=(const DataClass &rhs);
-    bool operator>=(const DataClass &rhs);
-    bool operator>(const DataClass &rhs);
-    friend std::ostream& operator<<(std::ostream &out, const DataClass &obj);
-    friend class Tuple;
-    friend class RM;
-};
 
 struct SelectCondition{
     std::string on_attr;
