@@ -1,6 +1,7 @@
 #ifndef _API_H_
 #define _API_H_
 
+#include <vector>
 #include "CatalogManager.h"
 #include "Interpreter.h"
 #include "RecordManager.h"

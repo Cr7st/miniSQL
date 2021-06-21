@@ -54,7 +54,7 @@ private:
      * @brief To get the memory content of the source address
      * @param source: the address of the source memory
      */
-    void ReadFrom(void *source);
+    void ReadFrom(const void *source);
 public:
     ~Tuple();
 
@@ -88,7 +88,8 @@ public:
     void SelectTuple(std::vector<SelectCondition> &conditions, void* source, TableInfo &info);
     void GetSelectRS(std::vector<Tuple> &result);
     void InsertTuple(void *destination, TableInfo &table, std::vector<DataClass> &list);
-    bool InsertCheck(void *source, TableInfo &table, std::vector<DataClass> &list);
+    void* GetSource(Tuple *t);
+    bool InsertCheck(const void *source, TableInfo &table, std::vector<DataClass> &list);
     bool DeleteCheck(std::vector<SelectCondition> &conditions, void *source, TableInfo &info);
 };
 

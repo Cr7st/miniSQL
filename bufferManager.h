@@ -17,7 +17,9 @@
 #define _BUFFER_MANAGER_H_
 #include <vector>
 #include <cassert>
-#include "ERROR/Error.h"
+#include "./ERROR/Error.h"
+#include "CatalogManager.h"
+#include "RecordManager.h"
 extern "C" {
 #include<io.h>
 #include<fcntl.h>
@@ -83,7 +85,7 @@ public:
 class FileHeadInfo
 {
 public:
-	void Initialize();							//初始化
+	void Initialize(TableInfo &info);			//初始化
 	FileAddr firstDel;							//第一条被删除地址
 	FileAddr lastDel;							//最后一条被删除地址
 	FileAddr NewInsert;							//末尾可插入新数据地址
@@ -152,6 +154,7 @@ class Clock
 	friend bool InsertRecord(TB_Insert_Info tb_insert_info, std::string path /*= std::string("./")*/);
 	//缺如
 	friend bool DropTable(std::string table_name, std::string path);
+	friend bool OpenTable(std::string table_name);
 
 public:
 	Clock();
@@ -193,6 +196,8 @@ class MemFile
 	friend class BufferManager;
 	friend class BTree;
 	friend bool DropTable(std::string table_name, std::string path);
+	friend bool OpenTable(std::string table_name);
+	bool InsertTuple(std::string table_name, std::vector<DataClass> &list);
 
 public:
 	/**
@@ -243,7 +248,7 @@ public:
 	//打开文件，打开失败返回 nullptr
 	MemFile* operator[](const char* fileName);					
 
-	void CreateFile(const char* fileName);
+	void CreateFile(const char* fileName, TableInfo &info);
 	void CloseFile(const char* fileName);
 	void CloseAllFile();
 
