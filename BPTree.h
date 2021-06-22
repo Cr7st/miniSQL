@@ -2,9 +2,10 @@
 // Created by 86152 on 2021/6/20.
 //
 
-#ifndef _BPTREE_H_
-#define _BPTREE_H_
+#ifndef BPTREE_H
+#define BPTREE_H
 #include "bufferManager.h"
+#include "RecordManager.h"
 #include "GlobalClass.h"
 #include <queue>
 
@@ -44,7 +45,7 @@ public:
     // 参数：索引文件名称， 关键字类型， 记录各个类型信息数组， 记录各个字段名称信息数组
     BPTree(std::string idx_name);
     BPTree(const std::string idx_name, const std::string tb_name, int KeyTypeIndex, char (&_RecordTypeInfo)[RecordColumnCount],
-           char (&_RecordColumnName)[RecordColumnCount / 4 * ColumnNameLength]);          // 创建索引文件的B+树
+           char (&_RecordColumnName)[RecordColumnCount / 4 * ColumnNameLength], TableInfo& info);          // 创建索引文件的B+树
     ~BPTree() { }
     FileAddr Search(DataClass search_key);                                        // 查找关键字是否已经存在
     bool Insert(DataClass k, FileAddr k_fd);                                      // 插入关键字k
