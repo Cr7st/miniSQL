@@ -227,14 +227,14 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
         bool found_index = false;
         int idx_cond = 0;
         int idx_i = 0;
-        BPTree tree(table_name);
+        BPTree tree;
         TableInfo& table_info = CatalogManager.LookUpTableInfo(table_name);
         std::vector<Tuple> result_set;
         for (int i = 0; i < conditions.size(); i++) {
             for (int j = 0; j < table_info.n_columns(); j++) {
                 if (table_info[j].column_name == conditions[i].attr) {
                     if (table_info[j].has_index) {
-                        tree = BPTree(table_name + table_info[j].column_name);
+                        for (int )
                         found_index = true;
                         idx_i = j;
                         break;
@@ -278,7 +278,7 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
             RecordManager.DeleteCheck(conditions, file->ReadRecord(addr_list[i]), table_info);
             file->DeleteRecord(addr_list[i], table_info.CalTupleSize());//郑博文修改于 06-22 16:20，DeleteRecord第二个参数为需要删除得记录数据长度
             //缺如
-            //DropIndex()
+            
             deleteNumber++;
         }
         //RecordManager.GetSelectRS(result_set);
