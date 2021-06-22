@@ -10,21 +10,22 @@ BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTyp
         :str_idx_name(idx_name), table_name(tb_name)
 {
     auto &buffer = GetGlobalFileBuffer();
-    auto pMemFile = buffer[table_name.c_str()];
+    std::string idx_file_name = str_idx_name + ".idx";
+    auto pMemFile = buffer[idx_file_name.c_str()];
 
     // 如果索引文件不存在则创建
     if (!pMemFile)
     {
         // 创建索引文件
-        buffer.CreateFile(table_name.c_str());
-        pMemFile = buffer[table_name.c_str()];
+        buffer.CreateFile(idx_file_name.c_str());
+        pMemFile = buffer[idx_file_name.c_str()];
 
         // 初始化索引文件，创建一个根结点
         BTNode root_node;
         root_node.node_type = NodeType::ROOT;
         root_node.count_valid_key = 0;
         root_node.next = FileAddr{ 0,0 };
-        FileAddr root_node_fd= buffer[table_name.c_str()]->AddRecord(&root_node, sizeof(root_node));
+        FileAddr root_node_fd= buffer[idx_file_name.c_str()]->AddRecord(&root_node, sizeof(root_node));
 
         // 初始化其他索引文件头信息
         idx_head.root = root_node_fd;
@@ -37,7 +38,7 @@ BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTyp
 
 
         // 将结点的地址写入文件头的预留空间区
-        memcpy(buffer[table_name.c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve, &idx_head, sizeof(idx_head));
+        memcpy(buffer[idx_file_name.c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve, &idx_head, sizeof(idx_head));
 
     }
     file_id = pMemFile->fileID;
@@ -46,6 +47,7 @@ BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTyp
 BPTree::BPTree(std::string idx_name)
 {
     str_idx_name = idx_name;
+    idx_name = idx_name + ".idx";
     file_id = GetGlobalFileBuffer()[idx_name.c_str()]->fileID;
 }
 
