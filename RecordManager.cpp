@@ -41,21 +41,20 @@ Tuple::Tuple(TableInfo &info, std::vector<DataClass> &list)
             case DataType::INT:
                 ptr.type = DataType::INT;
                 ptr.bytes = 4;
-                data_list.push_back(ptr);
                 ptr.data.i = list[i].data.i;
+                data_list.push_back(ptr);
                 break;
             case DataType::FLOAT:
                 ptr.type = DataType::FLOAT;
                 ptr.bytes = 8;
-                data_list.push_back(ptr);
                 ptr.data.f = list[i].data.f;
+                data_list.push_back(ptr);
                 break;
             case DataType::CHAR:
                 ptr.type = DataType::CHAR;
                 ptr.bytes = info.columns[i].bytes;
-                data_list.push_back(ptr);
-                ptr.data.str = (char*)malloc(ptr.bytes);
                 strcpy(ptr.data.str, list[i].data.str);
+                data_list.push_back(ptr);
                 break;
             default: break;
         }

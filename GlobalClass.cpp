@@ -40,7 +40,6 @@ DataClass::DataClass(double f){
 DataClass::DataClass(std::string str){
     type = DataType::CHAR;
     bytes = str.length();
-    data.str = new char[bytes+1];
     strcpy(data.str, str.c_str());
 }
 
