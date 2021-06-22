@@ -10,21 +10,21 @@ BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTyp
         :str_idx_name(idx_name), table_name(tb_name)
 {
     auto &buffer = GetGlobalFileBuffer();
-    auto pMemFile = buffer[table_name.c_str()];
+    auto pMemFile = buffer[(str_idx_name+".idx").c_str()];
 
     // 如果索引文件不存在则创建
     if (!pMemFile)
     {
         // 创建索引文件
-        buffer.CreateFile(table_name.c_str());
-        pMemFile = buffer[table_name.c_str()];
+        buffer.CreateFile((str_idx_name+".idx").c_str());
+        pMemFile = buffer[(str_idx_name+".idx").c_str()];
 
         // 初始化索引文件，创建一个根结点
         BTNode root_node;
         root_node.node_type = NodeType::ROOT;
         root_node.count_valid_key = 0;
         root_node.next = FileAddr{ 0,0 };
-        FileAddr root_node_fd= buffer[table_name.c_str()]->AddRecord(&root_node, sizeof(root_node));
+        FileAddr root_node_fd= buffer[(str_idx_name+".idx").c_str()]->AddRecord(&root_node, sizeof(root_node));
 
         // 初始化其他索引文件头信息
         idx_head.root = root_node_fd;
@@ -37,7 +37,7 @@ BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTyp
 
 
         // 将结点的地址写入文件头的预留空间区
-        memcpy(buffer[table_name.c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve, &idx_head, sizeof(idx_head));
+        memcpy(buffer[(str_idx_name+".idx").c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve, &idx_head, sizeof(idx_head));
 
     }
     file_id = pMemFile->fileID;
@@ -141,7 +141,7 @@ FileAddr BPTree::DeleteKeyAtInnerNode(FileAddr x, int i, DataClass key)
         // 更新next
         py->next = RBrother->next;
         // 删除右结点
-        GetGlobalFileBuffer()[table_name.c_str()]->DeleteRecord(&px->children[i + 1], sizeof(BTNode));
+        GetGlobalFileBuffer()[(str_idx_name+".idx").c_str()]->DeleteRecord(&px->children[i + 1], sizeof(BTNode));
         // 更新父节点索引
         for (int j = i + 2; j < px->count_valid_key; j++)
         {
@@ -164,7 +164,7 @@ FileAddr BPTree::DeleteKeyAtInnerNode(FileAddr x, int i, DataClass key)
         LBrother->next = py->next;
 
         // 删除本结点
-        GetGlobalFileBuffer()[table_name.c_str()]->DeleteRecord(&px->children[i], sizeof(BTNode));
+        GetGlobalFileBuffer()[(str_idx_name+".idx").c_str()]->DeleteRecord(&px->children[i], sizeof(BTNode));
         // 更新父节点索引
         for (int j = i + 1; j < px->count_valid_key; j++)
         {
@@ -286,11 +286,11 @@ void BPTree::SplitChild(FileAddr x, int i, FileAddr y)
     if (py->node_type == NodeType::LEAF)
     {
         z.next = py->next;
-        z_fd = GetGlobalFileBuffer()[table_name.c_str()]->AddRecord(&z, sizeof(z));
+        z_fd = GetGlobalFileBuffer()[(str_idx_name+".idx").c_str()]->AddRecord(&z, sizeof(z));
         py->next = z_fd;
     }
     else
-        z_fd = GetGlobalFileBuffer()[table_name.c_str()]->AddRecord(&z, sizeof(z));
+        z_fd = GetGlobalFileBuffer()[(str_idx_name+".idx").c_str()]->AddRecord(&z, sizeof(z));
 
     px->children[j] = z_fd;
     px->count_valid_key++;
@@ -413,7 +413,7 @@ bool BPTree::Insert(DataClass k, FileAddr k_fd)
     }
 
     // 得到根结点的fd
-    FileAddr root_fd = *(FileAddr*)GetGlobalFileBuffer()[table_name.c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve;
+    FileAddr root_fd = *(FileAddr*)GetGlobalFileBuffer()[(str_idx_name+".idx").c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve;
     auto proot = FileAddrToMemPtr(root_fd);
     if (proot->count_valid_key == MaxKeyCount)
     {
@@ -423,11 +423,11 @@ bool BPTree::Insert(DataClass k, FileAddr k_fd)
         s.count_valid_key = 1;
         s.key[0] = proot->key[0];
         s.children[0] = root_fd;
-        FileAddr s_fd = GetGlobalFileBuffer()[table_name.c_str()]->AddRecord(&s, sizeof(BTNode));
+        FileAddr s_fd = GetGlobalFileBuffer()[(str_idx_name+".idx").c_str()]->AddRecord(&s, sizeof(BTNode));
 
         // 将新的根节点文件地址写入
-        *(FileAddr*)GetGlobalFileBuffer()[table_name.c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve = s_fd;
-        GetGlobalFileBuffer()[table_name.c_str()]->GetFirstBlock()->isDirty = true;
+        *(FileAddr*)GetGlobalFileBuffer()[(str_idx_name+".idx").c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve = s_fd;
+        GetGlobalFileBuffer()[(str_idx_name+".idx").c_str()]->GetFirstBlock()->isDirty = true;
 
         //将旧的根结点设置为叶子结点
         auto pOldRoot = FileAddrToMemPtr(root_fd);
@@ -463,7 +463,7 @@ FileAddr BPTree::Delete(DataClass key)
         return FileAddr{0,0};
 
     // 得到根结点的fd
-    FileAddr root_fd = *(FileAddr*)GetGlobalFileBuffer()[table_name.c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve;
+    FileAddr root_fd = *(FileAddr*)GetGlobalFileBuffer()[(str_idx_name+".idx").c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve;
     auto proot = FileAddrToMemPtr(root_fd);
 
 
@@ -499,10 +499,10 @@ FileAddr BPTree::Delete(DataClass key)
     if (proot->count_valid_key == 1)
     {
         // 将新的根节点文件地址写入
-        *(FileAddr*)GetGlobalFileBuffer()[table_name.c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve = proot->children[0];
-        GetGlobalFileBuffer()[table_name.c_str()]->GetFirstBlock()->isDirty = true;
+        *(FileAddr*)GetGlobalFileBuffer()[(str_idx_name+".idx").c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve = proot->children[0];
+        GetGlobalFileBuffer()[(str_idx_name+".idx").c_str()]->GetFirstBlock()->isDirty = true;
 
-        GetGlobalFileBuffer()[table_name.c_str()]->DeleteRecord(&root_fd, sizeof(BTNode));
+        GetGlobalFileBuffer()[(str_idx_name+".idx").c_str()]->DeleteRecord(&root_fd, sizeof(BTNode));
     }
 
     return fd_delete;
@@ -513,7 +513,7 @@ void BPTree::PrintBPTreeStruct()
     std::queue<FileAddr> fds;
     //int n = 0;
     // 得到根结点的fd
-    FileAddr root_fd = *(FileAddr*)GetGlobalFileBuffer()[table_name.c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve;
+    FileAddr root_fd = *(FileAddr*)GetGlobalFileBuffer()[(str_idx_name+".idx").c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve;
     auto pRoot = FileAddrToMemPtr(root_fd);
     if (pRoot->node_type == NodeType::ROOT||pRoot->node_type == NodeType::LEAF)
     {
@@ -549,7 +549,7 @@ void BPTree::PrintBPTreeStruct()
 
 void BPTree::PrintAllLeafNode()
 {
-    auto phead = (IndexHeadNode*)GetGlobalFileBuffer()[table_name.c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve;
+    auto phead = (IndexHeadNode*)GetGlobalFileBuffer()[(str_idx_name+".idx").c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve;
     auto pRoot = FileAddrToMemPtr(phead->root);
     if (pRoot->count_valid_key <= 0)
     {
@@ -581,7 +581,7 @@ void BPTree::PrintAllLeafNode()
 
 IndexHeadNode * BPTree::GetPtrIndexHeadNode()
 {
-    auto phead = (IndexHeadNode*)GetGlobalFileBuffer()[table_name.c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve;
+    auto phead = (IndexHeadNode*)GetGlobalFileBuffer()[(str_idx_name+".idx").c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve;
     return phead;
 }
 
