@@ -55,7 +55,7 @@ bool DropTable(std::string table_name)
                 //unique
                 else
                     // idx = info[i].index_name + ".idx";
-                    idx = table_name + info[i].column_name + ".idx";
+                    idx = info.GetIndexName(i) + ".idx";
             }
             if (_access(idx.c_str(), 0 == -1))
             {
@@ -272,7 +272,7 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
                     if (table_info[j].has_index)
                     {
                         DropTable(table_info[j].column_name);
-                        DropIndex(table_info[j].index_name);//drop index
+                        DropIndex(table_info.GetIndexName(j));//drop index
                         tree = BPTree(table_name + table_info[j].column_name);
                         found_index = true;
                         idx_i = j;
