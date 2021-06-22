@@ -4,8 +4,8 @@ RM RecordManager;
 CM CatalogManager;
 BufferManager bufferManager;
 
-void CreateTable(std::string table_name, std::vector<std::string>& column_names,
-    std::vector<std::string>& data_types, int PK_index)
+void CreateTable(std::string table_name, std::vector<std::string> column_names,
+    std::vector<std::string> data_types, int PK_index)
 {
     TableInfo info = CatalogManager.InitTableInfo(table_name, column_names, data_types, PK_index);
     std::string full_name = table_name + ".db";
@@ -92,9 +92,11 @@ bool DropTable(std::string table_name)
         remove(dbf.c_str());
         return true;
     }
+    else
+        return false;
 }
 
-bool InsertTuple(std::string table_name, std::vector<DataClass>& list)
+bool InsertTuple(std::string table_name, std::vector<DataClass> &list)
 {
     std::string table_file_name = table_name + ".db";
     if (OpenTable(table_file_name)) {
@@ -105,13 +107,13 @@ bool InsertTuple(std::string table_name, std::vector<DataClass>& list)
                 // if the column is unique all a primary key, should check duplication
                 if (info[i].is_PK) {
                     BPTree tree(table_name);
-                    if (tree.Search(list[i]))
+                    if (*(tree.Search(list[i])) != FileAddr{0 ,0})
                         throw SQLError::KEY_INSERT_ERROR();
                 }
                 // if the unique attribute has an index, use it to search
                 else if (info[i].has_index) {
                     BPTree tree(table_name + info[i].column_name);
-                    if (!tree.Search(list[i]))
+                    if (*(tree.Search(list[i])) != FileAddr{0 ,0})
                         throw SQLError::KEY_INSERT_ERROR();
                 }
                 // if it doesm't have an index, linear scan all the records
@@ -150,7 +152,7 @@ bool InsertTuple(std::string table_name, std::vector<DataClass>& list)
     }
 }
 
-std::vector<Tuple> SelectTuples(std::vector<SelectCondition>& conditions, std::string table_name)
+std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::string table_name)
 {
     std::string full_name = table_name + ".db";
     if (OpenTable(full_name)) {
@@ -216,7 +218,7 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition>& conditions, std::s
 }
 
 //待修改
-bool DeleteTuples(std::vector<SelectCondition>& conditions, std::string table_name)
+bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_name)
 {
     int deleteNumber = 0;
     std::string full_name = table_name + ".db";
@@ -289,28 +291,34 @@ bool DeleteTuples(std::vector<SelectCondition>& conditions, std::string table_na
 
 bool CreateIndex(std::string table_name, std::string index_name,std::string column_name)
 {
-    TableInfo& table_info = CatalogManager.LookUpTableInfo(table_name);
-    int indexNum = -1;
-     
-    for (int i = 0; i < table_info.n_columns(); i++)
-    {
-        if (table_info[i].column_name == column_name && table_info[i].is_unique)//不需要判断是否为主键，因为主键建立时必定建立索引
+    std::string tb_full_name = table_name + std::string(".db");
+    if (OpenTable(tb_full_name)){
+        TableInfo& table_info = CatalogManager.LookUpTableInfo(table_name);
+        int indexNum = -1;
+        
+        for (int i = 0; i < table_info.n_columns(); i++)
         {
-            indexNum = i;
+            if (table_info[i].column_name == column_name && table_info[i].is_unique)//不需要判断是否为主键，因为主键建立时必定建立索引
+            {
+                indexNum = i;
+            }
         }
+        if (indexNum == -1)
+        {
+            std::logic_error e("error: attribute name is not found!");
+            throw std::exception(e);
+        }
+        //BPTree tree(index_name);
+        CatalogManager.SetIdxOn(table_info, indexNum, index_name);
+        std::string idx = index_name + ".idx";
+        BPTree tree(index_name, table_name, );
+        FileAddr addr;
+        addr.SetFileAddr(0, sizeof(BlockHead) + sizeof(FileHeadInfo) - FILEHI_RESERVE_SPACE);
+        void *p = bufferManager[tb_full_name.c_str()]->ReadWriteRecord(&addr);
+        CatalogManager.WriteTo(table_info, p);
+        return true;
     }
-    if (indexNum == -1)
-    {
-        std::logic_error e("error: attribute name is not found!");
-        throw std::exception(e);
-    }
-    BPTree tree(table_name + table_info[indexNum].column_name);
-    CatalogManager;
-    std::string idx = index_name + ".idx";
-    BPTree tree(idx);
-    /**/
-    return true;
-
+    else return false;
 }
 
 //存疑
@@ -340,6 +348,7 @@ bool DropIndex(std::string index_name)
             close(fileidx->fileID);
         }
     remove(idx.c_str());
+
     return true;
 }
 
