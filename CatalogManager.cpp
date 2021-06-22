@@ -115,22 +115,27 @@ TableInfo& CM::LookUpTableInfo(std::string name)
 }
 
 
-bool CM::SetIdxOn(TableInfo &table, int index, void *destination)
+bool CM::SetIdxOn(TableInfo &table, int index, std::string index_name)
 {
-    if (table.SetIdxOn(index)){
-        table.WriteTo(destination);
+    if (index_name.length() >= 28){
+        std::string e("Index name too long!");
+        throw SQLError::TABLE_ERROR(e);
+    }
+    if (table.SetIdxOn(index, index_name)){
         return true;
     }
     else return false;
 }
 
 
-bool TableInfo::SetIdxOn(int index)
+bool TableInfo::SetIdxOn(int index, std::string index_name)
 {
     if (columns.at(index).has_index)
         return false;
     else{
         columns.at(index).has_index = true;
+        index_names.push_back(index_name);
+        index_on.push_back(index);
         return true;
     }
 }
@@ -215,6 +220,12 @@ struct TableInfoMem* TableInfo::GetPatchedData()
         }
         *dest_addr = '\0';
     }
+    dest_addr = (char*)res + 512;
+    for (int i = 0; i < index_on.size(); i++){
+        memcpy(dest_addr, &index_on[i], 4);
+        memcpy(dest_addr + 4, index_names[i].c_str(), 28);
+        dest_addr += 32;
+    }
     return res;
 }
 
@@ -234,6 +245,7 @@ void TableInfo::ReadFrom(void *source)
     memcpy(&n_col, (char*)source + 28, 4);
     int attr_info = 0;
     int data_type = 0;
+    int n_indicies = 0;
     char *source_i = (char*)source;
     for (int i = 0; i < n_col; i++)
     {
@@ -242,8 +254,11 @@ void TableInfo::ReadFrom(void *source)
         source_i = source_i + 32;
         memcpy(&attr_info, source_i, 4);
         columns[i].is_PK = attr_info & 1;
+        if (columns[i].is_PK)  PK_index = i;
         columns[i].is_unique = attr_info & 2;
         columns[i].has_index = attr_info & 4;
+        if (columns[i].has_index) n_indicies += 1;
+        if (columns[i].has_index) 
         memcpy(&data_type, source_i + 4, 4);
         switch (data_type){
             case 1:
@@ -260,5 +275,18 @@ void TableInfo::ReadFrom(void *source)
         memcpy(&(columns[i].bytes), source_i + 8, 4);
         memcpy(name, source_i + 12, 20);
         columns[i].column_name = std::string(name);
+    }
+    int index = 0;
+    source_i = (char*)source + 512;
+    for (int i = 0; i < n_indicies; i++){
+        memcpy(&index, source_i, 4);
+        if (!columns.at(index).has_index){
+            throw SQLError::READ_ERROR();
+        }
+        else{
+            memcpy(name, source_i + 4, 28);
+            index_names.push_back(std::string(name));
+            index_on.push_back(index);
+        }
     }
 }

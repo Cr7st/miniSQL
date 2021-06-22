@@ -41,6 +41,7 @@ struct TableInfoMem{
     char name[28];
     char n_col[4];
     char columns_info[32 * 15];
+    char indicies_info[32 * 16];
 };
 
 /**
@@ -51,6 +52,7 @@ class TableInfo{
 private:
     int PK_index;
     std::vector<int> index_on;
+    std::vector<std::string> index_names;
     std::vector<ColumnInfo> columns;
     std::string table_name;
 
@@ -76,7 +78,7 @@ public:
      */
     int CalTupleSize() const;
 
-    bool SetIdxOn(int index);
+    bool SetIdxOn(int index, std::string index_name);
 
     ColumnInfo operator[](int idx) const; 
 
@@ -115,8 +117,11 @@ public:
     TableInfo& LookUpTableInfo(std::string name);
 
     void CreateTable(TableInfo &table, void *destination);
-    //bool SetIndexOn(std::string table_name, std::string column_name);
-    bool SetIdxOn(TableInfo &table, int index, void *destination);
+    
+    /**
+     * 注意：对SetIdxOn之后对表信息进行了修改，需要将表头信息重新写
+     */
+    bool SetIdxOn(TableInfo &table, int index, std::string index_name);
 
     bool DropTable(std::string name);
 
