@@ -320,3 +320,16 @@ void TableInfo::ReadFrom(void *source)
         }
     }
 }
+
+std::string TableInfo::GetIndexName(int n)
+{
+    if (columns[n].has_index){
+        for (int i = 0; i < index_on.size(); i++){
+            if (index_on[i] == n)
+                return index_names[i];
+        }
+    }
+    else{
+        return std::string("null");
+    }
+}
