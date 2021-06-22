@@ -81,6 +81,8 @@ public:
 
     bool SetIdxOn(int index, std::string index_name);
 
+    std::string GetIndexName(int n);
+
     ColumnInfo operator[](int idx) const; 
 
     friend class FileHeadInfo;

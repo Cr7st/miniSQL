@@ -325,7 +325,7 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
             RecordManager.DeleteCheck(conditions, file->ReadRecord(addr_list[i]), table_info);
             file->DeleteRecord(addr_list[i], table_info.CalTupleSize()); //郑博文修改于 06-22 16:20，DeleteRecord第二个参数为需要删除得记录数据长度
             //缺如
-            //DropIndex()
+            
             deleteNumber++;
         }
         std::cout<<"成功删除"<< deleteNumber <<"条记录！";
@@ -361,7 +361,6 @@ bool CreateIndex(std::string table_name, std::string index_name, std::string col
         //BPTree tree(index_name);
         CatalogManager.SetIdxOn(table_info, indexNum, index_name);
         std::string idx = index_name + ".idx";
-        // BPTree tree(index_name, table_name);
 
         //************************************************************************
         int KeyTypeIndex = 0;
@@ -431,7 +430,12 @@ bool DropIndex(std::string index_name)
     if (OpenTable(table_name))
     {
         TableInfo &table_info = CatalogManager.LookUpTableInfo(table_name);
-        CatalogManager.DropIndex(table_name, index_name);
+        CatalogManager.DropIndex(table_info, index_name);
+        FileAddr addr;
+        addr.SetFileAddr(0, sizeof(BlockHead) + sizeof(FileHeadInfo) - FILEHI_RESERVE_SPACE);
+        std::string tb_full_name = table_name + ".db";
+        void *p = bufferManager[tb_full_name.c_str()]->ReadWriteRecord(&addr);
+        CatalogManager.WriteTo(table_info, p);
     }
     //删除文件
     auto pClock = GetGlobalClock();
