@@ -152,9 +152,9 @@ class Clock
 	friend class BTree;
 	//缺如
 	friend bool InsertRecord(TB_Insert_Info tb_insert_info, std::string path /*= std::string("./")*/);
-	//缺如
-	friend bool DropTable(std::string table_name, std::string path);
+	friend bool DropTable(std::string table_name);
 	friend bool OpenTable(std::string table_name);
+	friend bool DropIndex(std::string index_name);
 
 public:
 	Clock();
@@ -195,9 +195,10 @@ class MemFile
 {
 	friend class BufferManager;
 	friend class BTree;
-	friend bool DropTable(std::string table_name, std::string path);
+	friend bool DropTable(std::string table_name);
 	friend bool OpenTable(std::string table_name);
-	bool InsertTuple(std::string table_name, std::vector<DataClass> &list);
+	friend bool InsertTuple(std::string table_name, std::vector<DataClass> &list);
+	friend bool DropIndex(std::string index_name);
 
 public:
 	/**
