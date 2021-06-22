@@ -55,7 +55,7 @@ bool DropTable(std::string table_name)
                 //unique
                 else
                     // idx = info[i].index_name + ".idx";
-                    idx = table_name + info[i].column_name + ".idx";
+                    idx = info.GetIndexName(i) + ".idx";
             }
             if (_access(idx.c_str(), 0 == -1))
             {
@@ -126,7 +126,7 @@ bool InsertTuple(std::string table_name, std::vector<DataClass> &list)
                     if (*(tree.Search(list[i])) != FileAddr{0, 0})
                         throw SQLError::KEY_INSERT_ERROR();
                 }
-                // if it doesm't have an index, linear scan all the records
+                // if it doesn't have an index, linear scan all the records
                 else
                 {
                     BPTree tree(table_name);
@@ -271,7 +271,8 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
                 {
                     if (table_info[j].has_index)
                     {
-                        DropTable(table_info[j].)
+                        DropTable(table_info[j].column_name);
+                        DropIndex(table_info.GetIndexName(j));//drop index
                         tree = BPTree(table_name + table_info[j].column_name);
                         found_index = true;
                         idx_i = j;
@@ -327,6 +328,7 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
             
             deleteNumber++;
         }
+        std::cout<<"成功删除"<< deleteNumber <<"条记录！";
         //RecordManager.GetSelectRS(result_set);
         return true;
     }

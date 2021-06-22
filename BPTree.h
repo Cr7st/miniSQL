@@ -38,6 +38,7 @@ public:
 
 class BPTree
 {
+    friend bool DropIndex(std::string index_name);
     //friend std::vector<RecordHead> ShowTable(std::string table_name, std::string path);
     //friend RecordHead GetDbfRecord(std::string table_name, FileAddr fd, std::string path);
 public:
