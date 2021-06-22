@@ -139,21 +139,21 @@ void RM::GetSelectRS(std::vector<Tuple> &result)
 bool RM::Satisfy(SelectCondition &condition, Tuple &tuple, const TableInfo &info)
 {
     for (int i = 0; i < info.n_columns(); i++){
-        if (condition.on_attr == info.columns[i].column_name){
+        if (condition.attr == info.columns[i].column_name){
             if (condition.op == "=="){
-                return tuple.data_list[i] == condition.cmp_value;
+                return tuple.data_list[i] == condition.value;
             }
             else if (condition.op == "<"){
-                return tuple.data_list[i] < condition.cmp_value;
+                return tuple.data_list[i] < condition.value;
             }
             else if (condition.op == "<="){
-                return tuple.data_list[i] <= condition.cmp_value;
+                return tuple.data_list[i] <= condition.value;
             }
             else if (condition.op == ">"){
-                return tuple.data_list[i] > condition.cmp_value;
+                return tuple.data_list[i] > condition.value;
             }
             else if (condition.op == ">="){
-                return tuple.data_list[i] >= condition.cmp_value;
+                return tuple.data_list[i] >= condition.value;
             }
         }
     }

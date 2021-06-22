@@ -2,10 +2,10 @@
 // Created by 86152 on 2021/6/20.
 //
 
-#ifndef BPTREE_H
-#define BPTREE_H
+#ifndef _BPTREE_H_
+#define _BPTREE_H_
 #include "bufferManager.h"
-#include "RecordManager.h"
+#include "GlobalClass.h"
 #include <queue>
 
 
@@ -28,7 +28,7 @@ public:
     NodeType node_type;                              // node type
     int count_valid_key;                             // the number of key has stored in the node
 
-    DataClass key[MaxKeyCount];                        // array of keys
+    DataClass key[MaxKeyCou];                        // array of keys
     FileAddr children[MaxChildCount];                // if the node is not a leaf node, children store the children pointer
     // otherwise it store record address;
 

@@ -11,7 +11,7 @@
 *
 * version:1.00
 ***********************************/
-#include "BufferManager.h"
+#include "bufferManager.h"
 #include <iostream>
 #include <string>
 
@@ -102,7 +102,7 @@ MemBlock::~MemBlock()
 	{
 		this->BacktoFile();
 	}
-	delete PtrtoBlockBegin;
+	free(PtrtoBlockBegin);
 }
 
 FileHeadInfo* MemBlock::GetFileHeadInfo() const

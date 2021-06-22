@@ -8,12 +8,6 @@
 #include <string>
 #include <cstring>
 
-struct SelectCondition{
-    std::string on_attr;
-    std::string op;
-    DataClass cmp_value;
-};
-
 class Tuple{
 protected:
     std::vector<DataClass> data_list;
