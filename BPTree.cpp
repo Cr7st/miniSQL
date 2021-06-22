@@ -7,8 +7,9 @@
 
 BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTypeIndex, char(&_RecordTypeInfo)[RecordColumnCount],
                char(&_RecordColumnName)[RecordColumnCount / 4 * ColumnNameLength])
-        :str_idx_name(idx_name), table_name(tb_name)
+        :table_name(tb_name)
 {
+    str_idx_name = tb_name + " " + idx_name ;
     auto &buffer = GetGlobalFileBuffer();
     auto pMemFile = buffer[(str_idx_name+".idx").c_str()];
 
@@ -47,6 +48,7 @@ BPTree::BPTree(std::string idx_name)
 {
     str_idx_name = idx_name;
     file_id = GetGlobalFileBuffer()[idx_name.c_str()]->fileID;
+    //table_name = GetGlobalFileBuffer()[idx_name.c_str()]->table_name;
 }
 
 FileAddr BPTree::DeleteKeyAtInnerNode(FileAddr x, int i, DataClass key)
