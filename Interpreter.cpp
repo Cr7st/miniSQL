@@ -47,7 +47,15 @@ void Select(string command){
             for (i=0; i < command.length() && command[i] != ',' && command.substr(i, i+3) != "and"; i++);
             string value = command.substr(0, i);
             trim(value);
-            SelectCondition tmp = {attr, op, value};
+            int n = 0;
+            for(i=0; i<value.length(); i++)
+                if(value[i] == '.')  n++;
+                else if(value[i] < '0' || value[i] > '9') break;
+            DataClass ptr;
+            if(i<value.length()) ptr = DataClass(atoi(value.c_str()));
+            else if(n==1) ptr = DataClass(atof(value.c_str()));
+            else ptr = DataClass(value.c_str());
+            SelectCondition tmp = {attr, op, ptr};
             condition.push_back(tmp);
             if (i == command.length()) break;
             if(command.substr(i, i+3) != "and")
@@ -83,7 +91,7 @@ void Insert(string command){
     if(attr.size() != content.size())
         cout<<"The number of parameters is wrong\n";
     else
-        InsertApi(attr, content);
+        InsertTuple(attr, content);
 }
 
 void Delete(string command){

@@ -311,7 +311,54 @@ bool CreateIndex(std::string table_name, std::string index_name,std::string colu
         //BPTree tree(index_name);
         CatalogManager.SetIdxOn(table_info, indexNum, index_name);
         std::string idx = index_name + ".idx";
-        BPTree tree(index_name, table_name, );
+
+        //************************************************************************
+        int KeyTypeIndex = 0;
+        for (int j = 0; j < table_info.columns.size(); j++)
+        {
+            if (table_info.columns[j].is_PK)
+            {
+                KeyTypeIndex = j;
+                break;
+            }
+        }
+
+        // 字段信息
+        char RecordTypeInfo[RecordColumnCount];          // 记录字段类型信息
+        char *ptype = RecordTypeInfo;
+        char RecordColumnName[RecordColumnCount / 4 * ColumnNameLength];
+        char *pname = RecordColumnName;
+
+        const auto &column_info_ref = table_info.columns;
+        for (int i = 0; i < column_info_ref.size(); i++)
+        {
+            // 类型信息
+            switch (column_info_ref[i].type)
+            {
+                case DataType::INT:
+                    *ptype++ = 'I';
+                    break;
+
+                case  DataType::FLOAT:
+                    *ptype++ = 'D';
+                    break;
+
+                case DataType::CHAR:
+                    *ptype++ = 'C';
+                    *ptype++ = column_info_ref[i].bytes / 100 + '0';
+                    *ptype++ = (column_info_ref[i].bytes % 100) / 10 + '0';
+                    *ptype++ = column_info_ref[i].bytes % 10 + '0';
+                default:
+                    break;
+            }
+            // 名称信息
+            strcpy(pname, column_info_ref[i].column_name.c_str());
+            pname += ColumnNameLength;
+        }
+        *ptype = '\0';
+        //************************************************************************
+
+        BPTree tree(index_name, table_name, KeyTypeIndex, RecordTypeInfo, RecordColumnName);
         FileAddr addr;
         addr.SetFileAddr(0, sizeof(BlockHead) + sizeof(FileHeadInfo) - FILEHI_RESERVE_SPACE);
         void *p = bufferManager[tb_full_name.c_str()]->ReadWriteRecord(&addr);
