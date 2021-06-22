@@ -18,6 +18,7 @@ public:
     int         KeyTypeIndex;                               // 关键字字段的位置
     char        RecordTypeInfo[RecordColumnCount];          // 记录字段类型信息，
     char        RecordColumnName[RecordColumnCount/4* ColumnNameLength];
+    char        TableName[20];
 };
 
 // define B+tree Node
@@ -43,7 +44,7 @@ class BPTree
     //friend RecordHead GetDbfRecord(std::string table_name, FileAddr fd, std::string path);
 public:
     // 参数：索引文件名称， 关键字类型， 记录各个类型信息数组， 记录各个字段名称信息数组
-    BPTree(std::string idx_name, std::string tb_name);
+    BPTree(std::string idx_name);
     BPTree(const std::string idx_name, const std::string tb_name, int KeyTypeIndex, char (&_RecordTypeInfo)[RecordColumnCount],
            char (&_RecordColumnName)[RecordColumnCount / 4 * ColumnNameLength]);          // 创建索引文件的B+树
     ~BPTree() { }

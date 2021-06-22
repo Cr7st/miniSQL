@@ -9,7 +9,7 @@ BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTyp
                char(&_RecordColumnName)[RecordColumnCount / 4 * ColumnNameLength])
         :table_name(tb_name)
 {
-    str_idx_name = tb_name + " " + idx_name ;
+    str_idx_name = idx_name ;
     auto &buffer = GetGlobalFileBuffer();
     auto pMemFile = buffer[(str_idx_name+".idx").c_str()];
 
@@ -31,6 +31,7 @@ BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTyp
         idx_head.root = root_node_fd;
         idx_head.MostLeftNode = root_node_fd;
         idx_head.KeyTypeIndex = KeyTypeIndex;
+        strcpy(idx_head.TableName, tb_name.c_str());
         //strcpy(idx_head.RecordTypeInfo, _RecordTypeInfo.c_str());
         memcpy(idx_head.RecordTypeInfo, _RecordTypeInfo, RecordColumnCount);
         //strcpy(idx_head.RecordColumnName, _RecordColumnName.c_str());
@@ -44,9 +45,9 @@ BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTyp
     file_id = pMemFile->fileID;
 }
 
-BPTree::BPTree(std::string idx_name, std::string tb_name)
+BPTree::BPTree(std::string idx_name)
 {
-    str_idx_name = tb_name + "" + idx_name;
+    str_idx_name = idx_name;
     file_id = GetGlobalFileBuffer()[idx_name.c_str()]->fileID;
     //table_name = GetGlobalFileBuffer()[idx_name.c_str()]->table_name;
 }
