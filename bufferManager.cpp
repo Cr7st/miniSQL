@@ -194,7 +194,7 @@ unsigned int Clock::GetReplaceableBlock()
 		if (MemBlocks[i] == nullptr)
 		{
 			MemBlocks[i] = new MemBlock();
-			return 1;
+			return i;
 		}
 	}
 
@@ -216,7 +216,7 @@ unsigned int Clock::GetReplaceableBlock()
 MemBlock* Clock::GetExistBlock(unsigned long fileID, unsigned long fileBlockID)
 {
 	// 寻找在memBlock List 的 Block
-	for (int i = i; i <= MEM_BLOCKAMOUNT; i++)
+	for (int i = 1; i <= MEM_BLOCKAMOUNT; i++)
 	{
 		if (MemBlocks[i] && MemBlocks[i]->fileID == fileID && MemBlocks[i]->fileBlockID == fileBlockID)
 			return MemBlocks[i];
@@ -385,7 +385,7 @@ FileAddr MemFile::MemWrite(const void* source, size_t length)
 
 	//写入
 	FileAddr writeRes = MemWrite(source, length, &insertPos);
-	if (writeRes.fileBlockID == insertPos.fileBlockID && writeRes.offset == insertPos.offset)\
+	if (writeRes.fileBlockID == insertPos.fileBlockID && writeRes.offset == insertPos.offset)
 	{
 		//开辟新的空间
 		AddExtraBlock();
