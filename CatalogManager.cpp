@@ -122,12 +122,41 @@ bool CM::SetIdxOn(TableInfo &table, int index, std::string index_name)
         std::string e("Index name too long!");
         throw SQLError::TABLE_ERROR(e);
     }
+    for (int i = 0; i < table.index_on.size(); i++){
+        if (table.index_names[i] == index_name){
+            std::string e("There is already an index named");
+            e = e + index_name;
+            e = e + "in table";
+            e = e + table.table_name;
+            throw SQLError::TABLE_ERROR(e);
+            return false;
+        }
+    }
     if (table.SetIdxOn(index, index_name)){
         return true;
     }
     else return false;
 }
 
+bool CM::DropIndex(TableInfo &table, std::string index_name)
+{
+    for (int i = 0; i < table.index_names.size(); i++){
+        if (table.index_names[i] == index_name){
+            table.index_names.erase(table.index_names.begin() + i);
+            table.columns[table.index_on[i]].has_index = false;
+            table.index_on.erase(table.index_on.begin() + i);
+            return true;
+        }
+    }
+    std::string e("There is no such index!");
+    throw SQLError::TABLE_ERROR(e);
+    return false;
+}
+
+void CM::WriteTo(TableInfo &info, void *destination)
+{
+    info.WriteTo(destination);
+}
 
 bool TableInfo::SetIdxOn(int index, std::string index_name)
 {
