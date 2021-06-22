@@ -18,8 +18,7 @@
 #include <vector>
 #include <cassert>
 #include "./ERROR/Error.h"
-#include "CatalogManager.h"
-#include "RecordManager.h"
+#include "GlobalClass.h"
 extern "C" {
 #include<io.h>
 #include<fcntl.h>
@@ -30,7 +29,7 @@ extern "C" {
 constexpr int FILE_BLOCKSIZE = 8192;	                    // 内存block(==文件页)大小
 constexpr int MEM_BLOCKAMOUNT = 4096;                    // 内存block数量
 constexpr int MAX_FILENAME_LEN = 256;                   // 文件名（包含路径）最大长度
-const unsigned int FILEHI_RESERVE_SPACE = 512;			// 文件头预留空间
+const unsigned int FILEHI_RESERVE_SPACE = 1024;			// 文件头预留空间
 
 class Clock;
 class BufferManager;

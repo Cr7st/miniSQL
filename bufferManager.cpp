@@ -325,7 +325,8 @@ FileAddr MemFile::AddRecord(const void* const source, size_t sz_record)
 		memcpy((char*)tmpSource + sizeof(FileAddr), source, sz_record);
 		MemWrite(tmpSource, sz_record + sizeof(FileAddr), &firstDelPos);
 	}
-	delete tmpSource;
+	//malloc用free，new用delete
+	free(tmpSource);
 	pMemBlock->SetModified();	//设置为脏页
 	return fh;
 }
@@ -469,7 +470,8 @@ void BufferManager::CreateFile(const char* fileName)
 {
 	// 文件存在 创建失败
 	int ptrtoFile = open(fileName, _O_BINARY | O_RDWR, 0664);
-	if (ptrtoFile != 01)
+	//此处为-1，原先写成01了
+	if (ptrtoFile != -1)
 	{
 		close(ptrtoFile);
 		return;
@@ -487,7 +489,8 @@ void BufferManager::CreateFile(const char* fileName)
 	//写回
 	write(newFile, ptr, FILE_BLOCKSIZE);
 	close(newFile);
-	delete ptr;
+	//malloc用free，new用delete
+	free(ptr);
 	return;
 }
 
