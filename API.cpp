@@ -126,7 +126,7 @@ bool InsertTuple(std::string table_name, std::vector<DataClass> &list)
                     if (*(tree.Search(list[i])) != FileAddr{0, 0})
                         throw SQLError::KEY_INSERT_ERROR();
                 }
-                // if it doesm't have an index, linear scan all the records
+                // if it doesn't have an index, linear scan all the records
                 else
                 {
                     BPTree tree(table_name);
@@ -271,7 +271,8 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
                 {
                     if (table_info[j].has_index)
                     {
-                        DropTable(table_info[j].)
+                        DropTable(table_info[j].column_name);
+                        DropIndex(table_info[j].index_name);//drop index
                         tree = BPTree(table_name + table_info[j].column_name);
                         found_index = true;
                         idx_i = j;
@@ -327,6 +328,7 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
             //DropIndex()
             deleteNumber++;
         }
+        std::cout<<"成功删除"<< deleteNumber <<"条记录！";
         //RecordManager.GetSelectRS(result_set);
         return true;
     }
@@ -359,7 +361,7 @@ bool CreateIndex(std::string table_name, std::string index_name, std::string col
         //BPTree tree(index_name);
         CatalogManager.SetIdxOn(table_info, indexNum, index_name);
         std::string idx = index_name + ".idx";
-        BPTree tree(index_name, table_name);
+        // BPTree tree(index_name, table_name);
 
         //************************************************************************
         int KeyTypeIndex = 0;
