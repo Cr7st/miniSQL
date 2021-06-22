@@ -153,6 +153,10 @@ bool CM::DropIndex(TableInfo &table, std::string index_name)
     return false;
 }
 
+void CM::WriteTo(TableInfo &info, void *destination)
+{
+    info.WriteTo(destination);
+}
 
 bool TableInfo::SetIdxOn(int index, std::string index_name)
 {

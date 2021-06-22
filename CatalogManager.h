@@ -123,6 +123,8 @@ public:
      */
     bool SetIdxOn(TableInfo &table, int index, std::string index_name);
 
+    void WriteTo(TableInfo &info, void *destination);
+
     bool DropTable(std::string name);
     bool DropIndex(TableInfo &table, std::string index_name);
 
