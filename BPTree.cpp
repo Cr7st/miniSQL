@@ -6,7 +6,7 @@
 #include "BPTree.h"
 
 BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTypeIndex, char(&_RecordTypeInfo)[RecordColumnCount],
-             char(&_RecordColumnName)[RecordColumnCount / 4 * ColumnNameLength])
+               char(&_RecordColumnName)[RecordColumnCount / 4 * ColumnNameLength])
         :str_idx_name(idx_name), table_name(tb_name)
 {
     auto &buffer = GetGlobalFileBuffer();
@@ -373,11 +373,13 @@ std::vector<FileAddr*> BPTree::RangeSearch(DataClass low_key, DataClass high_key
     return AddrRes;
 }
 
-FileAddr BPTree::Search(DataClass search_key)
+FileAddr* BPTree::Search(DataClass search_key)
 {
     auto pMemPage = GetGlobalClock()->GetMemAddr(file_id, 0);
     auto pfilefd = (FileAddr*)pMemPage->GetFileHeadInfo()->reserve;  // 找到根结点的地址
-    return Search(search_key, *pfilefd);
+    FileAddr* fuck = new FileAddr;
+    *fuck = Search(search_key, *pfilefd);
+    return fuck;
 }
 
 FileAddr BPTree::Search(DataClass search_key, FileAddr node_fd)
@@ -400,7 +402,7 @@ bool BPTree::Insert(DataClass k, FileAddr k_fd)
     try
     {
         auto key_fd = Search(k);
-        if (key_fd != FileAddr{ 0,0 })
+        if (*key_fd != FileAddr{ 0,0 })
             throw SQLError::KEY_INSERT_ERROR();
     }
     catch (const SQLError::BaseError &error)
@@ -457,7 +459,7 @@ FileAddr BPTree::UpdateKey(DataClass k, DataClass k_new)
 FileAddr BPTree::Delete(DataClass key)
 {
     auto search_res = Search(key);
-    if (search_res.offset == 0)
+    if (search_res->offset == 0)
         return FileAddr{0,0};
 
     // 得到根结点的fd

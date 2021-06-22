@@ -46,7 +46,7 @@ public:
     BPTree(const std::string idx_name, const std::string tb_name, int KeyTypeIndex, char (&_RecordTypeInfo)[RecordColumnCount],
            char (&_RecordColumnName)[RecordColumnCount / 4 * ColumnNameLength]);          // 创建索引文件的B+树
     ~BPTree() { }
-    FileAddr Search(DataClass search_key);                                        // 查找关键字是否已经存在
+    FileAddr* Search(DataClass search_key);                                        // 查找关键字是否已经存在
     bool Insert(DataClass k, FileAddr k_fd);                                      // 插入关键字k
     FileAddr UpdateKey(DataClass k, DataClass k_new);                               // 返回关键字对应的记录地址
     FileAddr Delete(DataClass k);                                                 // 返回该关键字记录在数据文件中的地址
