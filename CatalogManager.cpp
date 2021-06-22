@@ -92,9 +92,10 @@ TableInfo CM::InitTableInfo(std::string table_name, std::vector<std::string> &co
         }
         table.columns.push_back(column);
     }
+    table.index_names.push_back(table_name);
+    table.index_on.push_back(PK_index);
     table.columns[PK_index].is_PK = true;
     table.columns[PK_index].has_index = true;
-    table.index_on.push_back(PK_index);
     table.PK_index = PK_index;
     return table;
 }
@@ -220,11 +221,11 @@ struct TableInfoMem* TableInfo::GetPatchedData()
         }
         *dest_addr = '\0';
     }
-    dest_addr = (char*)res + 512;
+    dest_addr = res->indicies_info;
     for (int i = 0; i < index_on.size(); i++){
+        dest_addr = res->indicies_info + 32 * i;
         memcpy(dest_addr, &index_on[i], 4);
         memcpy(dest_addr + 4, index_names[i].c_str(), 28);
-        dest_addr += 32;
     }
     return res;
 }
@@ -253,12 +254,11 @@ void TableInfo::ReadFrom(void *source)
         columns.push_back(column);
         source_i = source_i + 32;
         memcpy(&attr_info, source_i, 4);
-        columns[i].is_PK = attr_info & 1;
+        columns[i].is_PK = (bool)(attr_info & 1);
         if (columns[i].is_PK)  PK_index = i;
-        columns[i].is_unique = attr_info & 2;
-        columns[i].has_index = attr_info & 4;
+        columns[i].is_unique = (bool)(attr_info & 2);
+        columns[i].has_index = (bool)(attr_info & 4);
         if (columns[i].has_index) n_indicies += 1;
-        if (columns[i].has_index) 
         memcpy(&data_type, source_i + 4, 4);
         switch (data_type){
             case 1:
@@ -279,6 +279,7 @@ void TableInfo::ReadFrom(void *source)
     int index = 0;
     source_i = (char*)source + 512;
     for (int i = 0; i < n_indicies; i++){
+        source_i = source_i + 32;
         memcpy(&index, source_i, 4);
         if (!columns.at(index).has_index){
             throw SQLError::READ_ERROR();

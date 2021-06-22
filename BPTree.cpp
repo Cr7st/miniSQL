@@ -6,7 +6,7 @@
 #include "BPTree.h"
 
 BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTypeIndex, char(&_RecordTypeInfo)[RecordColumnCount],
-             char(&_RecordColumnName)[RecordColumnCount / 4 * ColumnNameLength], TableInfo& info)
+             char(&_RecordColumnName)[RecordColumnCount / 4 * ColumnNameLength])
         :str_idx_name(idx_name), table_name(tb_name)
 {
     auto &buffer = GetGlobalFileBuffer();
@@ -16,7 +16,7 @@ BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTyp
     if (!pMemFile)
     {
         // 创建索引文件
-        buffer.CreateFile(table_name.c_str(), info);
+        buffer.CreateFile(table_name.c_str());
         pMemFile = buffer[table_name.c_str()];
 
         // 初始化索引文件，创建一个根结点
