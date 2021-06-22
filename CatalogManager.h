@@ -67,6 +67,7 @@ private:
 
     void ReadFrom(void *source);
 public:
+    friend bool CreateIndex(std::string table_name, std::string index_name,std::string column_name);
     /**
      * @brief Get the number of columns/attributes of the table
      */
