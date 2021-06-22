@@ -188,7 +188,7 @@ void RM::InsertTuple(void *destination, TableInfo &table, std::vector<DataClass>
     memcpy(destination, p, table.CalTupleSize());
 }
 
-bool RM::DeleteCheck(std::vector<SelectCondition> &conditions, void *source, TableInfo &info)
+bool RM::DeleteCheck(std::vector<SelectCondition> &conditions, const void *source, TableInfo &info)
 {
     Tuple tuple(info);
     tuple.ReadFrom(source);

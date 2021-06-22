@@ -65,7 +65,8 @@ public:
     void InsertTuple(void *destination, TableInfo &table, std::vector<DataClass> &list);
     void* GetSource(Tuple *t);
     bool InsertCheck(const void *source, TableInfo &table, std::vector<DataClass> &list);
-    bool DeleteCheck(std::vector<SelectCondition> &conditions, void *source, TableInfo &info);
+    bool DeleteCheck(std::vector<SelectCondition> &conditions, const void *source, TableInfo &info);
+
 };
 
 #endif
