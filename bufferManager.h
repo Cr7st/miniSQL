@@ -85,7 +85,7 @@ public:
 class FileHeadInfo
 {
 public:
-	void Initialize(TableInfo &info);			//初始化
+	void Initialize();			//初始化
 	FileAddr firstDel;							//第一条被删除地址
 	FileAddr lastDel;							//最后一条被删除地址
 	FileAddr NewInsert;							//末尾可插入新数据地址
@@ -248,7 +248,7 @@ public:
 	//打开文件，打开失败返回 nullptr
 	MemFile* operator[](const char* fileName);					
 
-	void CreateFile(const char* fileName, TableInfo &info);
+	void CreateFile(const char* fileName);
 	void CloseFile(const char* fileName);
 	void CloseAllFile();
 

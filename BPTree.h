@@ -54,11 +54,11 @@ public:
     IndexHeadNode *GetPtrIndexHeadNode();
     BTNode *FileAddrToMemPtr(FileAddr node_fd);                                 // 文件地址转换为内存指针
 
-    vector<FileAddr*> BPTree::RightSearch(DataClass low_key);
-    vector<FileAddr*> BPTree::LeftSearch(DataClass high_key);
-    vector<FileAddr*> BPTree::AllSearch();
-    vector<FileAddr*> BPTree::ExcludeSearch(DataClass key);
-    vector<FileAddr*> BPTree::RangeSearch(DataClass low_key, DataClass high_key);
+    std::vector<FileAddr*> BPTree::RightSearch(DataClass low_key);
+    std::vector<FileAddr*> BPTree::LeftSearch(DataClass high_key);
+    std::vector<FileAddr*> BPTree::AllSearch();
+    std::vector<FileAddr*> BPTree::ExcludeSearch(DataClass key);
+    std::vector<FileAddr*> BPTree::RangeSearch(DataClass low_key, DataClass high_key);
 
 private:
     FileAddr DeleteKeyAtInnerNode(FileAddr x, int i, DataClass key);              // x的下标为i的结点为叶子结点

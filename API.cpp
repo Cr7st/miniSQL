@@ -10,7 +10,11 @@ void CreateTable(std::string table_name, std::vector<std::string> &column_names,
     TableInfo info = CatalogManager.InitTableInfo(table_name, column_names, data_types, PK_index);
     std::string full_name = table_name + ".db";
     if (CatalogManager.NewInfoCheck(info)){
-        bufferManager.CreateFile(full_name.c_str(), info) ;
+        bufferManager.CreateFile(full_name.c_str());
+        FileAddr addr;
+        addr.SetFileAddr(0, sizeof(BlockHead) + sizeof(FileHeadInfo) - FILEHI_RESERVE_SPACE);
+        void *p = bufferManager[full_name.c_str()]->ReadWriteRecord(&addr);
+        CatalogManager.CreateTable(info, p);
     }
 }
 
@@ -84,7 +88,7 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
         MemFile *file = bufferManager[full_name.c_str()];
         bool found_index = false;
         int idx_cond = 0;
-        int idx_i;
+        int idx_i = 0;
         BPTree tree(table_name);
         TableInfo &table_info = CatalogManager.LookUpTableInfo(table_name);
         std::vector<Tuple> result_set;
@@ -111,19 +115,24 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
         }
         std::vector<FileAddr*> addr_list;
         const void *cmp_src;
-        if (found_index){
-            if (conditions[idx_cond].op == "="){
-                addr_list = tree.Search(conditions[idx_cond].value);
-            }
-            else if (conditions[idx_cond].op == "<" && conditions[idx_cond].op == "<="){
-                addr_list = tree.LeftSearch(conditions[idx_cond].value);
-            }
-            else if (conditions[idx_cond].op == ">" && conditions[idx_cond].op == ">="){
-                addr_list = tree.LeftSearch(conditions[idx_cond].value);
-            }
+        if (conditions.size() == 0){
+            addr_list = tree.AllSearch();
         }
         else{
-            addr_list = tree.AllSearch();
+            if (found_index){
+                if (conditions[idx_cond].op == "="){
+                    addr_list = tree.Search(conditions[idx_cond].value);
+                }
+                else if (conditions[idx_cond].op == "<" && conditions[idx_cond].op == "<="){
+                    addr_list = tree.LeftSearch(conditions[idx_cond].value);
+                }
+                else if (conditions[idx_cond].op == ">" && conditions[idx_cond].op == ">="){
+                    addr_list = tree.RightSearch(conditions[idx_cond].value);
+                }
+            }
+            else{
+                addr_list = tree.AllSearch();
+            }
         }
         for (int i = 0; i < addr_list.size(); i++){
             cmp_src = file->ReadRecord(addr_list[i]);
