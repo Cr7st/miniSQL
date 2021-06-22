@@ -158,9 +158,9 @@ class Clock
 public:
 	Clock();
 	~Clock();
+    //返回磁盘文件内存地址
+    MemBlock* GetMemAddr(unsigned long fileID, unsigned long filePageID);
 private:
-	//返回磁盘文件内存地址
-	MemBlock* GetMemAddr(unsigned long fileID, unsigned long filePageID);	
 	//创造新的Block
 	MemBlock* CreateNewBlock(unsigned long fileID, unsigned long fileBlockID);	
 
@@ -226,14 +226,19 @@ private:
 	//
 	void MemWipe(void* source, size_t sz_wipe, FileAddr* fdtoWipe);
 	//添加一页空间
-	MemBlock* AddExtraBlock();							
+	MemBlock* AddExtraBlock();
+
+public:
 	//得到文件首页
 	MemBlock* GetFirstBlock();									
 
 private:
 	char fileName[MAX_FILENAME_LEN];
-	unsigned long fileID;										//文件指针
 	unsigned long totalBlock;									//文件中共有页数
+
+public:
+    unsigned long fileID;										//文件指针
+
 };
 
 /*
