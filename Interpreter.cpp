@@ -22,6 +22,7 @@ void Select(string command){
     vector<SelectCondition> condition;
     string table;
     command = DeleteSpace(command.substr(6));
+    int i; //修改于 06-22 15:13 之前i没有定义
     while(command.substr(0,4) != "from"){
         for(i=0; command[i]!=',' || command[i]!=' '; i++) ;
         query.push_back(command.substr(0, i));
@@ -53,13 +54,14 @@ void Select(string command){
             command = DeleteSpace(command.substr(i+1));
         }
     }
-    SelectApi(query, table, condition);
+    SelectTuples(condition, table);  
 }
 
 void Insert(string command){
     vector<string> attr, content;
     string table;
     command = DeleteSpace(command.substr(11));
+    int i; //先前i没有定义
     for (i = 0; command[i] != '('; i++);
     table = command.substr(0, i);
     command = DeleteSpace(command.substr(i+1));
@@ -76,7 +78,7 @@ void Insert(string command){
         if(command[i] == ')') break;
         command = DeleteSpace(command.substr(i + (command[i] == ' ')));
     }
-    if(attr.length() != content.length())
+    if(attr.size() != content.size())
         cout<<"The number of parameters is wrong\n";
 }
 
@@ -88,31 +90,15 @@ void Create(string command){
 
 }
 
-void Interpreter(){
-    cout<<("Welcome to MiniSQL (GNU/Linux 4.15.0-142-generic x86_64)\n\n"
-           " * Documentation:  https://help.ubuntu.com\n"
-           " * Management:     https://landscape.canonical.com\n"
-           " * Support:        https://ubuntu.com/advantage\n\n"
-           "Now you can input some SQL command, inupt help for more information\n");
-    string command;
-    int i;
-    while (1) {
-        cout<<">>> ";
-        getline(cin, command);
-        command = DeleteSpace(command);
-        if(command=="exit")
-            break;
-        else if(command=="help")
-            Help();
-        else if(command.substr(0,6) == "select")
-            Select(command);
-        else if(command.substr(0,11) == "insert into")
-            Insert(command);
-        else if(command.substr(0,6) == "delete")
-            Delete(command);
-        else if(command.substr(0,6) == "create")
-            Create(command);
-        else
-            cout<<"Sorry, MiniSQL can't interpret your command, try again\n";
-    }
+void Interpreter(string command){
+    if(command.substr(0,6) == "select")
+        Select(command);
+    else if(command.substr(0,11) == "insert into")
+        Insert(command);
+    else if(command.substr(0,6) == "delete")
+        Delete(command);
+    else if(command.substr(0,6) == "create")
+        Create(command);
+    else
+        cout<<"Sorry, MiniSQL can't interpret your command, try again\n";
 }

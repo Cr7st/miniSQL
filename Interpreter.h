@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "RecordManager.h"
 #include "CatalogManager.h"
+#include "API.h"
 
 typedef struct{
     std::string attr;
@@ -11,3 +12,12 @@ typedef struct{
     friend class RM;
 }SelectCondition;
 
+void Interpreter(std::string command);
+
+void Insert(std::string command);
+
+void Select(std::string command);
+
+std::string DeleteSpace(std::string a);
+
+void trim(std::string &s);
