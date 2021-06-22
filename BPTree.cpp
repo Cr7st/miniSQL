@@ -44,9 +44,9 @@ BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTyp
     file_id = pMemFile->fileID;
 }
 
-BPTree::BPTree(std::string idx_name)
+BPTree::BPTree(std::string idx_name, std::string tb_name)
 {
-    str_idx_name = idx_name;
+    str_idx_name = tb_name + "" + idx_name;
     file_id = GetGlobalFileBuffer()[idx_name.c_str()]->fileID;
     //table_name = GetGlobalFileBuffer()[idx_name.c_str()]->table_name;
 }
