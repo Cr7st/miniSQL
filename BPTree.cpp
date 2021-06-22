@@ -4,12 +4,13 @@
 //
 
 #include "BPTree.h"
+#include <iostream>
 
 BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTypeIndex, char(&_RecordTypeInfo)[RecordColumnCount],
                char(&_RecordColumnName)[RecordColumnCount / 4 * ColumnNameLength])
         :table_name(tb_name)
 {
-    str_idx_name = tb_name + " " + idx_name ;
+    str_idx_name = idx_name;
     auto &buffer = GetGlobalFileBuffer();
     auto pMemFile = buffer[(str_idx_name+".idx").c_str()];
 
@@ -25,7 +26,8 @@ BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTyp
         root_node.node_type = NodeType::ROOT;
         root_node.count_valid_key = 0;
         root_node.next = FileAddr{ 0,0 };
-        FileAddr root_node_fd= buffer[(str_idx_name+".idx").c_str()]->AddRecord(&root_node, sizeof(root_node));
+        std::cout << sizeof(root_node) << std::endl;
+        FileAddr root_node_fd= pMemFile->AddRecord(&root_node, sizeof(root_node));
 
         // 初始化其他索引文件头信息
         idx_head.root = root_node_fd;
@@ -38,7 +40,7 @@ BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTyp
 
 
         // 将结点的地址写入文件头的预留空间区
-        memcpy(buffer[(str_idx_name+".idx").c_str()]->GetFirstBlock()->GetFileHeadInfo()->reserve, &idx_head, sizeof(idx_head));
+        memcpy(pMemFile->GetFirstBlock()->GetFileHeadInfo()->reserve, &idx_head, sizeof(idx_head));
 
     }
     file_id = pMemFile->fileID;
@@ -340,8 +342,9 @@ std::vector<FileAddr*> BPTree::AllSearch() {
     auto pMemPage = GetGlobalClock()->GetMemAddr(file_id, 0);
     auto pfilefd = (FileAddr*)pMemPage->GetFileHeadInfo()->reserve;  // 找到根结点的地址
     BTNode* Node = FileAddrToMemPtr(*pfilefd);
-    FileAddr Addr;
-    while(Node->node_type == NodeType::LEAF) {
+    BTNode* root = Node;
+    FileAddr Addr = *pfilefd;
+    while(FileAddrToMemPtr(root->children[0]) != root && Node->node_type != NodeType::LEAF) {
         Addr = Node->children[0];
         Node = FileAddrToMemPtr(Addr);
     }
