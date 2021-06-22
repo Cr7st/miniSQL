@@ -6,6 +6,7 @@
 #define BPTREE_H
 #include "bufferManager.h"
 #include "RecordManager.h"
+#include "GlobalClass.h"
 #include <queue>
 
 
@@ -38,14 +39,15 @@ public:
 
 class BPTree
 {
-    friend std::vector<RecordHead> ShowTable(std::string table_name, std::string path);
-    friend RecordHead GetDbfRecord(std::string table_name, FileAddr fd, std::string path);
+    //friend std::vector<RecordHead> ShowTable(std::string table_name, std::string path);
+    //friend RecordHead GetDbfRecord(std::string table_name, FileAddr fd, std::string path);
 public:
     // 参数：索引文件名称， 关键字类型， 记录各个类型信息数组， 记录各个字段名称信息数组
     BPTree(std::string idx_name);
-    BPTree(const std::string idx_name, const std::string tb_name, int KeyTypeIndex, char (&_RecordTypeInfo)[RecordColumnCount], char (&_RecordColumnName)[RecordColumnCount / 4 * ColumnNameLength]);          // 创建索引文件的B+树
+    BPTree(const std::string idx_name, const std::string tb_name, int KeyTypeIndex, char (&_RecordTypeInfo)[RecordColumnCount],
+           char (&_RecordColumnName)[RecordColumnCount / 4 * ColumnNameLength], TableInfo& info);          // 创建索引文件的B+树
     ~BPTree() { }
-    FileAddr* Search(DataClass search_key);                                        // 查找关键字是否已经存在
+    FileAddr Search(DataClass search_key);                                        // 查找关键字是否已经存在
     bool Insert(DataClass k, FileAddr k_fd);                                      // 插入关键字k
     FileAddr UpdateKey(DataClass k, DataClass k_new);                               // 返回关键字对应的记录地址
     FileAddr Delete(DataClass k);                                                 // 返回该关键字记录在数据文件中的地址
@@ -54,11 +56,11 @@ public:
     IndexHeadNode *GetPtrIndexHeadNode();
     BTNode *FileAddrToMemPtr(FileAddr node_fd);                                 // 文件地址转换为内存指针
 
-    std::vector<FileAddr*> BPTree::RightSearch(DataClass low_key);
-    std::vector<FileAddr*> BPTree::LeftSearch(DataClass high_key);
-    std::vector<FileAddr*> BPTree::AllSearch();
-    std::vector<FileAddr*> BPTree::ExcludeSearch(DataClass key);
-    std::vector<FileAddr*> BPTree::RangeSearch(DataClass low_key, DataClass high_key);
+    std::vector<FileAddr*> RightSearch(DataClass low_key);
+    std::vector<FileAddr*> LeftSearch(DataClass high_key);
+    std::vector<FileAddr*> AllSearch();
+    std::vector<FileAddr*> ExcludeSearch(DataClass key);
+    std::vector<FileAddr*> RangeSearch(DataClass low_key, DataClass high_key);
 
 private:
     FileAddr DeleteKeyAtInnerNode(FileAddr x, int i, DataClass key);              // x的下标为i的结点为叶子结点
