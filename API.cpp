@@ -53,33 +53,13 @@ bool DropTable(std::string table_name)
             std::string idx;
             if (info[i].has_index)
             {
-                idx = info.GetIndexName(i) + ".idx";
+                idx = info.GetIndexName(i);
+                DropIndex(idx);
             }
-            if (_access(idx.c_str(), 0 == -1))
-            {
-                return false;
-            }
-            else
-            {
-                MemFile *fileidx = GetGlobalFileBuffer()[idx.c_str()];
-                if (fileidx != nullptr)
-                {
-                    for (int i = 1; i <= MEM_BLOCKAMOUNT; i++)
-                    {
-                        if (pClock->MemBlocks[i] && pClock->MemBlocks[i]->fileID == fileidx->fileID)
-                        {
-                            pClock->MemBlocks[i]->fileID = 0;
-                            pClock->MemBlocks[i]->isDirty = 0;
-                        }
-                    }
-                }
-                close(fileidx->fileID);
-            }
-            remove(idx.c_str());
         }
         CatalogManager.DropTable(table_name);
         //郑博文添加于 06-22 14:32 CM::DropTable仅删除内存中表信息，需要实际继续实际删除该文件
-        MemFile *fileDb = buffer[dbf.c_str()];
+        MemFile *fileDb = GetGlobalFileBuffer()[dbf.c_str()];
         if (fileDb != nullptr)
         {
             for (int i = 1; i <= MEM_BLOCKAMOUNT; i++)
@@ -425,9 +405,9 @@ bool DropIndex(std::string index_name)
     std::string idx = index_name + ".idx";
 
     BPTree tree(index_name);
-    std::string table_name = tree.table_name;
+    std::string table_name = tree.GetPtrIndexHeadNode()->TableName;
     //消除表中信息
-    if (OpenTable(table_name))
+    if (OpenTable(table_name + ".db"))
     {
         TableInfo &table_info = CatalogManager.LookUpTableInfo(table_name);
         CatalogManager.DropIndex(table_info, index_name);
@@ -447,7 +427,7 @@ bool DropIndex(std::string index_name)
     else
     {
         //如果文件已经打开，需要丢弃在内存中的文件页
-        MemFile *fileidx = buffer[idx.c_str()];
+        MemFile *fileidx = GetGlobalFileBuffer()[idx.c_str()];
         if (fileidx != nullptr)
         {
             for (int i = 1; i <= MEM_BLOCKAMOUNT; i++)
@@ -478,11 +458,11 @@ bool ShowTable(std::string table_name)
         {
             cout << table_info[i].column_name << " ";
             if (table_info[i].type == DataType::INT)
-                cout << "int";
+                cout << "int ";
             else if (table_info[i].type == DataType::FLOAT)
-                cout << "float";
+                cout << "float ";
             else
-                cout << "char(" << table_info[i].bytes << ")";
+                cout << "char(" << table_info[i].bytes << ") ";
             if (table_info[i].is_unique)
                 cout << "unique";
             if (table_info[i].is_PK)
