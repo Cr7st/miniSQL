@@ -98,7 +98,7 @@ void Tuple::ReadFrom(const char *source)
         switch (data_list[i].type){
             case DataType::INT:
                 temp_size = sizeof(int);
-                memcpy(&(data_list[i].data.i), (char*)source, temp_size);
+                memcpy(&(data_list[i].data.i), (char*)source + offset, temp_size);
                 break;
             case DataType::FLOAT:
                 temp_size = sizeof(double);
@@ -139,7 +139,7 @@ bool RM::Satisfy(SelectCondition &condition, Tuple &tuple, const TableInfo &info
 {
     for (int i = 0; i < info.n_columns(); i++){
         if (condition.attr == info.columns[i].column_name){
-            if (condition.op == "=="){
+            if (condition.op == "="){
                 return tuple.data_list[i] == condition.value;
             }
             else if (condition.op == "<"){

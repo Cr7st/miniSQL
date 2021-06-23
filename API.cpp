@@ -51,17 +51,9 @@ bool DropTable(std::string table_name)
         for (int i = 0; i < info.n_columns(); i++)
         {
             std::string idx;
-            if (info[i].is_unique || info[i].is_PK)
+            if (info[i].has_index)
             {
-                //primary key
-                if (info[i].is_PK)
-                {
-                    idx = table_name + ".idx";
-                }
-                //unique
-                else
-                    // idx = info[i].index_name + ".idx";
-                    idx = info.GetIndexName(i) + ".idx";
+                idx = info.GetIndexName(i) + ".idx";
             }
             if (_access(idx.c_str(), 0 == -1))
             {
@@ -69,7 +61,7 @@ bool DropTable(std::string table_name)
             }
             else
             {
-                MemFile *fileidx = buffer[idx.c_str()];
+                MemFile *fileidx = GetGlobalFileBuffer()[idx.c_str()];
                 if (fileidx != nullptr)
                 {
                     for (int i = 1; i <= MEM_BLOCKAMOUNT; i++)
@@ -121,14 +113,14 @@ bool InsertTuple(std::string table_name, std::vector<DataClass> &list)
                 // if the column is unique all a primary key, should check duplication
                 if (info[i].is_PK)
                 {
-                    BPTree tree(table_name);
+                    BPTree tree(info.GetIndexName(i));
                     if (*(tree.Search(list[i])) != FileAddr{0, 0})
                         throw SQLError::KEY_INSERT_ERROR();
                 }
                 // if the unique attribute has an index, use it to search
                 else if (info[i].has_index)
                 {
-                    BPTree tree(table_name + info[i].column_name);
+                    BPTree tree(info.GetIndexName(i));
                     if (*(tree.Search(list[i])) != FileAddr{0, 0})
                         throw SQLError::KEY_INSERT_ERROR();
                 }
@@ -153,14 +145,9 @@ bool InsertTuple(std::string table_name, std::vector<DataClass> &list)
         // update the BPTrees of all the columns which has index
         for (int i = 0; i < info.n_columns(); i++)
         {
-            if (info[i].is_PK)
+            if (info[i].has_index)
             {
-                BPTree tree(table_name);
-                tree.Insert(list.at(i), addr);
-            }
-            else if (info[i].has_index)
-            {
-                BPTree tree(table_name + info[i].column_name);
+                BPTree tree(info.GetIndexName(i));
                 tree.Insert(list.at(i), addr);
             }
         }
@@ -194,7 +181,7 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
                 {
                     if (table_info[j].has_index)
                     {
-                        tree = BPTree(table_name + table_info[j].column_name);
+                        tree = BPTree(table_info.GetIndexName(i));
                         found_index = true;
                         idx_i = j;
                         break;
@@ -279,7 +266,7 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
 //                     {
 //                         DropTable(table_info[j].column_name);
 //                         DropIndex(table_info.GetIndexName(j));//drop index
-//                         tree = BPTree(table_name + table_info[j].column_name);
+//                         tree = BPTree(table_info.GetIndexName());
 //                         found_index = true;
 //                         idx_i = j;
 //                         break;
@@ -430,7 +417,7 @@ bool DropIndex(std::string index_name)
 {
     std::string idx = index_name + ".idx";
 
-    BPTree tree(idx);
+    BPTree tree(index_name);
     std::string table_name = tree.table_name;
     //消除表中信息
     if (OpenTable(table_name))
