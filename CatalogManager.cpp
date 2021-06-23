@@ -178,6 +178,10 @@ void CM::OpenTableFile(void *source)
 {
     TableInfo n;
     n.ReadFrom(source);
+    for (int i = 0; i < ex_tables.size(); i++){
+        if (ex_tables[i].table_name == n.table_name)
+            return;//已经打开无需再次压栈
+    }
     ex_tables.push_back(n);
 }
 
