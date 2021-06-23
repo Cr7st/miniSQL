@@ -8,7 +8,7 @@
 #include <cstring>
 
 class Tuple{
-friend void PrintResult::SelectTuple(std::string table_name, std::vector<Tuple> tuple);
+friend class PrintResult;
 protected:
     std::vector<DataClass> data_list;
     int tuple_size;
