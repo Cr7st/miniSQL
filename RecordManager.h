@@ -45,6 +45,7 @@ public:
      */
     //void WriteToBlock(Block block);
     friend class RM;
+    friend bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_name);
 };
 
 class RM{ //short for RecordManager

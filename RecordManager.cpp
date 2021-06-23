@@ -137,6 +137,7 @@ void RM::GetSelectRS(std::vector<Tuple> &result)
 
 bool RM::Satisfy(SelectCondition &condition, Tuple &tuple, const TableInfo &info)
 {
+    std::string e;
     for (int i = 0; i < info.n_columns(); i++){
         if (condition.attr == info.columns[i].column_name){
             if (condition.op == "="){
@@ -154,9 +155,12 @@ bool RM::Satisfy(SelectCondition &condition, Tuple &tuple, const TableInfo &info
             else if (condition.op == ">="){
                 return tuple.data_list[i] >= condition.value;
             }
+            else{
+                e = std::string("Operation fault in conditions!  ");
+            }
         }
     }
-    std::string e("There is an error in the select condition!");
+    e = std::string("There is no such attribute named: ") + condition.attr;
     throw SQLError::TABLE_ERROR(e);
     return false;
 }
@@ -189,11 +193,10 @@ void RM::InsertTuple(void *destination, TableInfo &table, std::vector<DataClass>
 
 bool RM::DeleteCheck(std::vector<SelectCondition> &conditions, const void *source, TableInfo &info)
 {
-    Tuple tuple(info);
-    tuple.ReadFrom((char*)source);
-    for (int i = 0; i < conditions.size(); i++)
-    {
-        if (!Satisfy(conditions[i], tuple, info))
+    Tuple t(info);
+    t.ReadFrom((char*)source);
+    for (int i = 0; i < conditions.size(); i++){
+        if (!Satisfy(conditions[i], t, info))
             return false;
     }
     return true;
