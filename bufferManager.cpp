@@ -284,7 +284,7 @@ void* MemFile::ReadWriteRecord(FileAddr* address)
 {
 	auto pMemBlock = GetGlobalClock()->GetMemAddr(this->fileID, address->fileBlockID);
 	pMemBlock->isDirty = true;
-	return (char*)(pMemBlock->PtrtoBlockBegin) + address->offset + sizeof(FileAddr);
+	return (char*)(pMemBlock->PtrtoBlockBegin) + address->offset;
 }
 
 FileAddr MemFile::AddRecord(const void* const source, size_t sz_record)
