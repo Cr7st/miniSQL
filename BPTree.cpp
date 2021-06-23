@@ -306,6 +306,25 @@ std::vector<FileAddr*> BPTree::LeftSearch(DataClass high_key) {
     auto pMemPage = GetGlobalClock()->GetMemAddr(file_id, 0);
     auto pfilefd = (FileAddr*)pMemPage->GetFileHeadInfo()->reserve;  // 找到根结点的地址
     BTNode* Node = FileAddrToMemPtr(*pfilefd);
+    BTNode* root = Node;
+    FileAddr Addr = *pfilefd;
+    while(root->children[root->count_valid_key] != FileAddr{0, 0} && Node->node_type != NodeType::LEAF) {
+        Addr = Node->children[0];
+        Node = FileAddrToMemPtr(Addr);
+    }
+    std::vector<FileAddr*> AddrRes;
+    while(Addr != FileAddr{0, 0}){
+        Node = FileAddrToMemPtr(Addr);
+        for(int i = 0; i <Node->count_valid_key; i++) {
+            AddrRes.push_back(Node->children + i);
+            if (Node->key[i] == high_key) return AddrRes;
+        }
+        Addr = Node->next;
+    }
+    return AddrRes;
+    /*auto pMemPage = GetGlobalClock()->GetMemAddr(file_id, 0);
+    auto pfilefd = (FileAddr*)pMemPage->GetFileHeadInfo()->reserve;  // 找到根结点的地址
+    BTNode* Node = FileAddrToMemPtr(*pfilefd);
     FileAddr Addr;
     while(Node->node_type == NodeType::LEAF) {
         Addr = Node->children[0];
@@ -320,7 +339,7 @@ std::vector<FileAddr*> BPTree::LeftSearch(DataClass high_key) {
         }
         Addr = Node->next;
     }
-    return AddrRes;
+    return AddrRes;*/
 }
 
 std::vector<FileAddr*> BPTree::RightSearch(DataClass low_key) {
