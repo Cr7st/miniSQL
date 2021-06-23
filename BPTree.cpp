@@ -509,7 +509,7 @@ FileAddr BPTree::Delete(DataClass key)
             proot->key[j - 1] = proot->key[j];
             proot->children[j - 1] = proot->children[j];
         }
-        proot->count_valid_key--;
+        proot->children[--proot->count_valid_key] = FileAddr{0, 0};
         return fd_res;
     }
 
