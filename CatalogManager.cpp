@@ -120,6 +120,11 @@ bool CM::SetIdxOn(TableInfo &table, int index, std::string index_name)
         std::string e("Index name too long!");
         throw SQLError::TABLE_ERROR(e);
     }
+    if (table[index].has_index){
+        std::string e("There is already an index on ");
+        e = e + table[index].column_name;
+        throw SQLError::TABLE_ERROR(e);
+    }
     for (int i = 0; i < table.index_on.size(); i++){
         if (table.index_names[i] == index_name){
             std::string e("There is already an index named");
@@ -173,6 +178,10 @@ void CM::OpenTableFile(void *source)
 {
     TableInfo n;
     n.ReadFrom(source);
+    for (int i = 0; i < ex_tables.size(); i++){
+        if (ex_tables[i].table_name == n.table_name)
+            return;//已经打开无需再次压栈
+    }
     ex_tables.push_back(n);
 }
 
