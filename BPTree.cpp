@@ -33,6 +33,7 @@ BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTyp
         idx_head.root = root_node_fd;
         idx_head.MostLeftNode = root_node_fd;
         idx_head.KeyTypeIndex = KeyTypeIndex;
+        strcpy(idx_head.TableName, tb_name.c_str());
         //strcpy(idx_head.RecordTypeInfo, _RecordTypeInfo.c_str());
         memcpy(idx_head.RecordTypeInfo, _RecordTypeInfo, RecordColumnCount);
         //strcpy(idx_head.RecordColumnName, _RecordColumnName.c_str());

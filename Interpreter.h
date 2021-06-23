@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdio.h>
 #include <cstdlib>
+#include <algorithm>
 #include "RecordManager.h"
 #include "CatalogManager.h"
 #include "GlobalClass.h"
