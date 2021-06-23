@@ -19,7 +19,7 @@ enum class DataType{INT, FLOAT, CHAR};
 union Data{
     int i;
     double f;
-    char str[16];
+    char str[30 ];
 };
 
 class DataClass{

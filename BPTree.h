@@ -28,7 +28,7 @@ public:
     NodeType node_type;                              // node type
     int count_valid_key;                             // the number of key has stored in the node
 
-    DataClass key[MaxKeyCount];                        // array of keys
+    DataClass key[MaxKeyCount];                      // array of keys
     FileAddr children[MaxChildCount];                // if the node is not a leaf node, children store the children pointer
     // otherwise it store record address;
 

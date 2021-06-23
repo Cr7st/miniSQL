@@ -2,7 +2,6 @@
 #define __RECORDMANAGER_H__
 #include "ERROR/Error.h"
 #include "CatalogManager.h"
-#include "Interpreter.h"
 #include "GlobalClass.h"
 #include <vector>
 #include <string>

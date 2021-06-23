@@ -2,7 +2,6 @@
 
 RM RecordManager;
 CM CatalogManager;
-BufferManager bufferManager;
 
 void CreateTable(std::string table_name, std::vector<std::string> column_names,
                  std::vector<std::string> data_types, int PK_index)
@@ -11,17 +10,24 @@ void CreateTable(std::string table_name, std::vector<std::string> column_names,
     std::string full_name = table_name + ".db";
     if (CatalogManager.NewInfoCheck(info))
     {
-        bufferManager.CreateFile(full_name.c_str());
+        try{
+            GetGlobalFileBuffer().CreateFile(full_name.c_str());
+        }
+        catch(SQLError::TABLE_ERROR e){
+            e.PrintError();
+            return;
+        }
         FileAddr addr;
         addr.SetFileAddr(0, sizeof(BlockHead) + sizeof(FileHeadInfo) - FILEHI_RESERVE_SPACE);
-        void *p = bufferManager[full_name.c_str()]->ReadWriteRecord(&addr);
+        void *p = GetGlobalFileBuffer()[full_name.c_str()]->ReadWriteRecord(&addr);
         CatalogManager.CreateTable(info, p);
+        CreateIndex(table_name, table_name, column_names[PK_index]);
     }
 }
 
 bool OpenTable(std::string file_name)
 {
-    MemFile *file = bufferManager[file_name.c_str()];
+    MemFile *file = GetGlobalFileBuffer()[file_name.c_str()];
     if (file != nullptr)
     {
         //注意看这一行！仅在OpenTable中有调用OpenTableFile，CM中可查表信息，所以确保调用OpenTable
@@ -38,7 +44,7 @@ bool DropTable(std::string table_name)
     if (OpenTable(dbf))
     { //郑博文修改与 06-23 14:23 CM.LookUpTable需要调用过OpenTable之后才能正常进行搜索
         TableInfo &info = CatalogManager.LookUpTableInfo(table_name);
-        auto &buffer = bufferManager;
+        auto &buffer = GetGlobalFileBuffer();
         auto pClock = GetGlobalClock();
         //去除主键和unique键的index
         //建议以下删除索引的操作可以调用DropIndex，代码重用有利于测试
@@ -106,7 +112,7 @@ bool InsertTuple(std::string table_name, std::vector<DataClass> &list)
     std::string table_file_name = table_name + ".db";
     if (OpenTable(table_file_name))
     {
-        MemFile *file = bufferManager[table_file_name.c_str()];
+        MemFile *file = GetGlobalFileBuffer()[table_file_name.c_str()];
         TableInfo &info = CatalogManager.LookUpTableInfo(table_name);
         for (int i = 0; i < info.n_columns(); i++)
         {
@@ -173,7 +179,7 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
     std::string full_name = table_name + ".db";
     if (OpenTable(full_name))
     {
-        MemFile *file = bufferManager[full_name.c_str()];
+        MemFile *file = GetGlobalFileBuffer()[full_name.c_str()];
         bool found_index = false;
         int idx_cond = 0;
         int idx_i = 0;
@@ -250,93 +256,93 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
 }
 
 //待修改
-bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_name)
-{
-    int deleteNumber = 0;
-    std::string full_name = table_name + ".db";
-    if (OpenTable(full_name))
-    {
-        MemFile *file = bufferManager[full_name.c_str()];
-        bool found_index = false;
-        int idx_cond = 0;
-        int idx_i = 0;
-        BPTree tree(table_name);
-        TableInfo &table_info = CatalogManager.LookUpTableInfo(table_name);
-        std::vector<Tuple> result_set;
-        for (int i = 0; i < conditions.size(); i++)
-        {
-            for (int j = 0; j < table_info.n_columns(); j++)
-            {
-                if (table_info[j].column_name == conditions[i].attr)
-                {
-                    if (table_info[j].has_index)
-                    {
-                        DropTable(table_info[j].column_name);
-                        DropIndex(table_info.GetIndexName(j));//drop index
-                        tree = BPTree(table_name + table_info[j].column_name);
-                        found_index = true;
-                        idx_i = j;
-                        break;
-                    }
-                    else if (table_info[j].is_PK)
-                    {
-                        throw SQLError::TABLE_ERROR();
-                        break;
-                    }
-                }
-            }
-            if (found_index)
-            {
-                idx_cond = i;
-                break;
-            }
-        }
-        std::vector<FileAddr *> addr_list;
-        const void *cmp_src;
-        //郑博文修改于 06-22 14:41 需要提前对conditions数目做判断，为0直接进行AllSearch，否则else中用 [] 访问一个空的容器会报错
-        if (conditions.size() == 0)
-        {
-            addr_list = tree.AllSearch();
-        }
-        else
-        {
-            if (found_index)
-            {
-                if (conditions[idx_cond].op == "=")
-                {
-                    addr_list.push_back(tree.Search(conditions[idx_cond].value));
-                }
-                else if (conditions[idx_cond].op == "<" && conditions[idx_cond].op == "<=")
-                {
-                    addr_list = tree.LeftSearch(conditions[idx_cond].value);
-                }
-                else if (conditions[idx_cond].op == ">" && conditions[idx_cond].op == ">=")
-                {
-                    addr_list = tree.LeftSearch(conditions[idx_cond].value);
-                }
-            }
-            else
-            {
-                addr_list = tree.AllSearch();
-            }
-        }
-        for (int i = 0; i < addr_list.size(); i++)
-        {
-            RecordManager.DeleteCheck(conditions, file->ReadRecord(addr_list[i]), table_info);
-            file->DeleteRecord(addr_list[i], table_info.CalTupleSize()); //郑博文修改于 06-22 16:20，DeleteRecord第二个参数为需要删除得记录数据长度
-            //缺如
+// bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_name)
+// {
+//     int deleteNumber = 0;
+//     std::string full_name = table_name + ".db";
+//     if (OpenTable(full_name))
+//     {
+//         MemFile *file = GetGlobalFileBuffer().[full_name.c_str()];
+//         bool found_index = false;
+//         int idx_cond = 0;
+//         int idx_i = 0;
+//         BPTree tree(table_name);
+//         TableInfo &table_info = CatalogManager.LookUpTableInfo(table_name);
+//         std::vector<Tuple> result_set;
+//         for (int i = 0; i < conditions.size(); i++)
+//         {
+//             for (int j = 0; j < table_info.n_columns(); j++)
+//             {
+//                 if (table_info[j].column_name == conditions[i].attr)
+//                 {
+//                     if (table_info[j].has_index)
+//                     {
+//                         DropTable(table_info[j].column_name);
+//                         DropIndex(table_info.GetIndexName(j));//drop index
+//                         tree = BPTree(table_name + table_info[j].column_name);
+//                         found_index = true;
+//                         idx_i = j;
+//                         break;
+//                     }
+//                     else if (table_info[j].is_PK)
+//                     {
+//                         throw SQLError::TABLE_ERROR();
+//                         break;
+//                     }
+//                 }
+//             }
+//             if (found_index)
+//             {
+//                 idx_cond = i;
+//                 break;
+//             }
+//         }
+//         std::vector<FileAddr *> addr_list;
+//         const void *cmp_src;
+//         //郑博文修改于 06-22 14:41 需要提前对conditions数目做判断，为0直接进行AllSearch，否则else中用 [] 访问一个空的容器会报错
+//         if (conditions.size() == 0)
+//         {
+//             addr_list = tree.AllSearch();
+//         }
+//         else
+//         {
+//             if (found_index)
+//             {
+//                 if (conditions[idx_cond].op == "=")
+//                 {
+//                     addr_list.push_back(tree.Search(conditions[idx_cond].value));
+//                 }
+//                 else if (conditions[idx_cond].op == "<" && conditions[idx_cond].op == "<=")
+//                 {
+//                     addr_list = tree.LeftSearch(conditions[idx_cond].value);
+//                 }
+//                 else if (conditions[idx_cond].op == ">" && conditions[idx_cond].op == ">=")
+//                 {
+//                     addr_list = tree.LeftSearch(conditions[idx_cond].value);
+//                 }
+//             }
+//             else
+//             {
+//                 addr_list = tree.AllSearch();
+//             }
+//         }
+//         for (int i = 0; i < addr_list.size(); i++)
+//         {
+//             RecordManager.DeleteCheck(conditions, file->ReadRecord(addr_list[i]), table_info);
+//             file->DeleteRecord(addr_list[i], table_info.CalTupleSize()); //郑博文修改于 06-22 16:20，DeleteRecord第二个参数为需要删除得记录数据长度
+//             //缺如
             
-            deleteNumber++;
-        }
-        std::cout<<"成功删除"<< deleteNumber <<"条记录！";
-        //RecordManager.GetSelectRS(result_set);
-        return true;
-    }
-    else
-    {
-        throw SQLError::TABLE_ERROR();
-    }
-}
+//             deleteNumber++;
+//         }
+//         std::cout<<"成功删除"<< deleteNumber <<"条记录！";
+//         //RecordManager.GetSelectRS(result_set);
+//         return true;
+//     }
+//     else
+//     {
+//         throw SQLError::TABLE_ERROR();
+//     }
+// }
 
 bool CreateIndex(std::string table_name, std::string index_name, std::string column_name)
 {
@@ -411,7 +417,7 @@ bool CreateIndex(std::string table_name, std::string index_name, std::string col
         BPTree tree(index_name, table_name, KeyTypeIndex, RecordTypeInfo, RecordColumnName);
         FileAddr addr;
         addr.SetFileAddr(0, sizeof(BlockHead) + sizeof(FileHeadInfo) - FILEHI_RESERVE_SPACE);
-        void *p = bufferManager[tb_full_name.c_str()]->ReadWriteRecord(&addr);
+        void *p = GetGlobalFileBuffer()[tb_full_name.c_str()]->ReadWriteRecord(&addr);
         CatalogManager.WriteTo(table_info, p);
         return true;
     }
@@ -434,12 +440,12 @@ bool DropIndex(std::string index_name)
         FileAddr addr;
         addr.SetFileAddr(0, sizeof(BlockHead) + sizeof(FileHeadInfo) - FILEHI_RESERVE_SPACE);
         std::string tb_full_name = table_name + ".db";
-        void *p = bufferManager[tb_full_name.c_str()]->ReadWriteRecord(&addr);
+        void *p = GetGlobalFileBuffer()[tb_full_name.c_str()]->ReadWriteRecord(&addr);
         CatalogManager.WriteTo(table_info, p);
     }
     //删除文件
     auto pClock = GetGlobalClock();
-    auto &buffer = bufferManager;
+    auto &buffer = GetGlobalFileBuffer();
     if (_access(idx.c_str(), 0 == -1))
     {
         return false;

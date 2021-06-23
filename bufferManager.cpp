@@ -474,6 +474,7 @@ void BufferManager::CreateFile(const char* fileName)
 	if (ptrtoFile != -1)
 	{
 		close(ptrtoFile);
+		throw SQLError::TABLE_ERROR(std::string("Table name conflict with previous tables"));
 		return;
 	}
 
