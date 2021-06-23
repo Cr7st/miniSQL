@@ -277,14 +277,14 @@ unsigned long Clock::ClockSwap()
 const void* MemFile::ReadRecord(FileAddr* address) const
 {
 	auto pMemBlock = GetGlobalClock()->GetMemAddr(this->fileID, address->fileBlockID);
-	return (char*)(pMemBlock->PtrtoBlockBegin) + address->offset;
+	return (char*)(pMemBlock->PtrtoBlockBegin) + address->offset + sizeof(FileAddr);
 }
 
 void* MemFile::ReadWriteRecord(FileAddr* address)
 {
 	auto pMemBlock = GetGlobalClock()->GetMemAddr(this->fileID, address->fileBlockID);
 	pMemBlock->isDirty = true;
-	return (char*)(pMemBlock->PtrtoBlockBegin) + address->offset;
+	return (char*)(pMemBlock->PtrtoBlockBegin) + address->offset + sizeof(FileAddr);
 }
 
 FileAddr MemFile::AddRecord(const void* const source, size_t sz_record)

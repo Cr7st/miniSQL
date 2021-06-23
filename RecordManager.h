@@ -22,7 +22,7 @@ private:
      * @brief To get the memory content of the source address
      * @param source: the address of the source memory
      */
-    void ReadFrom(const void *source);
+    void ReadFrom(const char *source);
 public:
     ~Tuple();
 

@@ -90,7 +90,7 @@ void* Tuple::GetWriteSource()
     return source;
 }
 
-void Tuple::ReadFrom(const void *source)
+void Tuple::ReadFrom(const char *source)
 {
     int offset = 0;
     int temp_size;
@@ -118,7 +118,7 @@ void Tuple::ReadFrom(const void *source)
 void RM::SelectTuple(std::vector<SelectCondition> &conditions, const void* source, TableInfo &info)
 {
     Tuple tuple(info);
-    tuple.ReadFrom(source);
+    tuple.ReadFrom((char*)source);
     for (int i = 0; i < conditions.size(); i++)
     {
         if (!Satisfy(conditions[i], tuple, info))
@@ -164,7 +164,7 @@ bool RM::Satisfy(SelectCondition &condition, Tuple &tuple, const TableInfo &info
 bool RM::InsertCheck(const void *source, TableInfo &table, std::vector<DataClass> &list)
 {
     Tuple ex(table);
-    ex.ReadFrom(source);
+    ex.ReadFrom((char*)source);
     for (int i = 0; i < table.n_columns(); i++){
         if (ex.data_list[i].type != list[i].type){
             throw SQLError::KEY_INSERT_ERROR();
@@ -190,7 +190,7 @@ void RM::InsertTuple(void *destination, TableInfo &table, std::vector<DataClass>
 bool RM::DeleteCheck(std::vector<SelectCondition> &conditions, const void *source, TableInfo &info)
 {
     Tuple tuple(info);
-    tuple.ReadFrom(source);
+    tuple.ReadFrom((char*)source);
     for (int i = 0; i < conditions.size(); i++)
     {
         if (!Satisfy(conditions[i], tuple, info))

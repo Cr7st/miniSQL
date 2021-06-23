@@ -345,7 +345,7 @@ std::vector<FileAddr*> BPTree::AllSearch() {
     BTNode* Node = FileAddrToMemPtr(*pfilefd);
     BTNode* root = Node;
     FileAddr Addr = *pfilefd;
-    while(FileAddrToMemPtr(root->children[0]) != root && Node->node_type != NodeType::LEAF) {
+    while(root->children[root->count_valid_key] != FileAddr{0, 0} && Node->node_type != NodeType::LEAF) {
         Addr = Node->children[0];
         Node = FileAddrToMemPtr(Addr);
     }

@@ -169,7 +169,7 @@ bool InsertTuple(std::string table_name, std::vector<DataClass> &list)
     }
     else
     {
-        throw SQLError::TABLE_ERROR();
+        throw SQLError::TABLE_ERROR(std::string("There is no such table!  "));
         return false;
     }
 }
