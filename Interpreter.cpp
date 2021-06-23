@@ -102,7 +102,46 @@ void Insert(string command){
 }
 
 void Delete(string command){
-
+    int i, j;
+    vector<string> query;
+    vector<SelectCondition> condition;
+    string table;
+    command = DeleteSpace(command.substr(6));
+    while(command.substr(0,4) != "from"){
+        for(i=0; command[i]!=',' || command[i]!=' '; i++) ;
+        query.push_back(command.substr(0, i));
+        command = DeleteSpace(command.substr(i + (command[i] == ' ')));
+    }
+    command = DeleteSpace(command.substr(4));
+    for(i=0; command[i]!=' '; i++) ;
+    table = command.substr(0, i);
+    command = DeleteSpace(command.substr(i));
+    if(command.find("where") != std::string::npos){
+        while(1)
+        {
+            for (i = 0; i < command.length() && command[i] != '!' && command[i] != '=' && command[i] != '<' &&
+                        command[i] != '>'; i++);
+            if (i == command.length()) break;
+            string attr = command.substr(0, i);
+            trim(attr);
+            command = DeleteSpace(command.substr(i));
+            string op = command.substr(0,1);
+            if (command[1] == '=') op += "=";
+            command = DeleteSpace(command.substr(1 + (command[1] != '=')));
+            for (i=0; i < command.length() && command[i] != ',' && command.substr(i, i+3) != "and"; i++);
+            string value = command.substr(0, i);
+            trim(value);
+            DataClass ptr = convert(value);
+            SelectCondition tmp = {attr, op, ptr};
+            condition.push_back(tmp);
+            if (i == command.length()) break;
+            if(command.substr(i, i+3) != "and")
+                command = DeleteSpace(command.substr(i+3));
+            else
+                command = DeleteSpace(command.substr(i+1));
+        }
+    }
+    DeleteTuples(condition, table);
 }
 
 void Create(string command){
@@ -197,4 +236,88 @@ void Interpreter(std::string command){
         Drop(command);
     else
         cout<<"Sorry, MiniSQL can't interpret your command, try again\n";
+}
+
+
+
+void PrintResult::CreateTable(bool is_created)
+{
+    if(is_created)
+    {
+        std::cout<<"table create succeeded!"<<std::endl;
+    }
+    else
+    {
+        std::cout<<"table create failed!"<<std::endl;
+    }
+}
+
+void PrintResult::DropTable(bool is_dropped)
+{
+    if(is_dropped)
+    {
+        std::cout<<"table drop succeeded!"<<std::endl;
+    }
+    else
+    {
+        std::cout<<"table drop failed!"<<std::endl;
+    }
+}
+
+void PrintResult::InsertTuple(bool is_inserted)
+{
+    if(is_inserted)
+    {
+        std::cout<<"tuple insert succeeded!"<<std::endl;
+    }
+    else
+    {
+        std::cout<<"tuple insert failed!"<<std::endl;
+    }
+}
+
+void PrintResult::SelectTuple(std::string table_name, std::vector<Tuple> tuple)
+{
+   std::cout<<"====="<<table_name<<"====="<<std::endl;
+   TableInfo &table_info = CatalogManager.LookUpTableInfo(table_name);
+   if(tuple.size() == 0)
+   {
+       std::cout<<" ----- empty -----"<<std::endl;
+       return;
+   }
+   else
+   {
+       //打印列名
+       for(int i  = 0;i<table_info.n_columns();i++)
+       {
+           std::cout<< "|" <<table_info[i].column_name<<"\t";
+       }
+       std::cout<<endl;
+       //分割线
+       //打印每一条记录
+       for(int i = 0;i<tuple.size();i++)
+       {
+           for(int j = 0; j<table_info.n_columns();j++)
+           {
+               cout<<tuple[i].data_list[j]<<"\t";
+           }
+           std::cout<<endl;
+       }
+   }
+}
+
+void PrintResult::DeleteTuple(int DeleteNum)
+{
+    if( DeleteNum == 1)
+    {
+        std::cout<<DeleteNum<<" tuple delete succeed!"<<std::endl;
+    }
+    else if(DeleteNum > 1)
+    {
+        std::cout<<DeleteNum<<" tuples delete succeed!"<<std::endl;
+    }
+    else
+    {
+        std::cout<<"0 tuple delete!"<<std::endl;
+    }
 }
