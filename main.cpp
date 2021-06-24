@@ -3,7 +3,7 @@
 #include <vector>
 #include <fstream>
 #include "Interpreter.h"
-#include <time.h>
+#include <ctime>
 #define TIME_MEASURE
 using namespace std;
 
@@ -32,7 +32,6 @@ void Init()
     cout << "\n" << space28 << "    All the command should end with \";\"" << endl;
     cout << space28 << "    \"quit;\": command to quit the system" << endl;
     cout << space28 << "       \"help;\": command to get help" << endl;
-    cout << "                       \"file;\": command to read SQL query from a file" << endl;
     cout << "\n" << "                   Copyright(c) 2021 Bowen Zheng, Yunqi Chen and Zehao Zhu" << endl;
     cout << longline << endl;                                                                                             
 }
@@ -49,10 +48,9 @@ void Run()
             break;
         else if (command == "help;")
             Help();
-        else if (command == "file;"){
-            cout << "Please enter the query file name:" << endl;
-            cin >> file_name;
-            file_name = file_name;
+        else if (command.substr(0, 7) == "exefile"){
+            command.erase(0, 8);
+            file_name = command.erase(command.length() - 1);
             FileGetCommand(file_name);
             cout << "file closed" << endl;
         }
@@ -100,13 +98,14 @@ void Help()
 	cout << R"(|Create database  : create database STU;                                                         |)" << std::endl;
 	cout << R"(|Use database     : use database STU;                                                            |)" << std::endl;
 	cout << R"(|Show database    : show databases;                                                              |)" << std::endl;
-	cout << R"(|Create Table     : create table student(id int primary, score float, name char(20));           |)" << std::endl;
-	cout << R"(|Insert Record(1) : insert into student values(1,95.5,ZhangSan);                   |)" << std::endl;
+	cout << R"(|Create Table     : create table student(id int primary, score float, name char(20));            |)" << std::endl;
+	cout << R"(|Insert Record(1) : insert into student values(1,95.5,ZhangSan);                                 |)" << std::endl;
 	cout << R"(|Insert Record(2) : insert into student(id,name)values(2,LiSi); Note:LiSi has no score           |)" << std::endl;
 	cout << R"(|Delete Table     : delete from student where id = 1; Note: ZhangSan is deleted                  |)" << std::endl;
 	cout << R"(|Select Table(1)  : select * from student where id = 2;                                          |)" << std::endl;
 	cout << R"(|Select Table(2)  : select * from student where id > 1 and score < 98;                           |)" << std::endl;
 	cout << R"(|Drop database    : drop database STU;                                                           |)" << std::endl;
+    cout << R"(|Execute file     : exefile testcase;                                                            |)" << std::endl;
 	cout << R"(|Quit             : quit;                                                                        |)" << std::endl;
 	cout << R"(+------------------------------------------------------------------------------------------------+)" << std::endl;
 	cout << R"(|Note             : Anytime you want to end MiniSQL use "quit;" command please.                  |)" << std::endl;

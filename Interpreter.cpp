@@ -267,12 +267,14 @@ void Drop(string command){
         }
         else if(command.substr(0, 5)=="table"){
             command = DeleteSpace(command.substr(5));
+            command.erase(command.length() - 1);
             trim(command);
             if(DropTable(command))
                 std::cout<<"Successfully Drop!";
         }
         else if(command.substr(0, 5)=="index"){
             command = DeleteSpace(command.substr(5));
+            command.erase(command.length() - 1);
             trim(command);
             if(DropIndex(command))
                 std::cout<<"Successfully Drop!";
