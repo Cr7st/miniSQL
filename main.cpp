@@ -4,6 +4,7 @@
 #include <fstream>
 #include "Interpreter.h"
 #include <time.h>
+#define TIME_MEASURE
 using namespace std;
 
 void Init();
