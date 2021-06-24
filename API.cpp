@@ -75,8 +75,11 @@ bool DropTable(std::string table_name)
         remove(dbf.c_str());
         return true;
     }
-    else
-        return false;
+    else{
+        std::string e("There is no such table named ");
+        e = e + table_name;
+        throw SQLError::TABLE_ERROR(e);
+    }
 }
 
 bool InsertTuple(std::string table_name, std::vector<DataClass> &list)
@@ -229,6 +232,7 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
                 addr_list = tree.AllSearch();
             }
         }
+        std::cout << addr_list.size() << std::endl;
         for (int i = 0; i < addr_list.size(); i++)
         {
             cmp_src = file->ReadRecord(addr_list[i]);
@@ -338,6 +342,7 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
                             i--;//addr_list中存的是指针，tree中删除后，addr_list中也会少
                                                         //若删除的是最后一个，则没有影响
                             addr_list.pop_back();
+                            std::cout << addr_list.size() << std::endl;
                         }
                     }
                 }
@@ -345,7 +350,7 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
                 deleteNumber++;
             }
         }
-        std::cout<<"成功删除"<< deleteNumber <<"条记录！";
+        std::cout<<"Successfully deleted "<< deleteNumber << " tuples!" << std::endl;
         //RecordManager.GetSelectRS(result_set);
         return true;
     }

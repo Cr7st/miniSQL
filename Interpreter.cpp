@@ -383,6 +383,7 @@ void PrintResult::SelectTuple(std::string table_name, std::vector<Tuple> tuple)
             }
             std::cout<<endl;
         }
+        std::cout << "Retrived " << tuple.size() << " tuples" << std::endl;
    }
 }
 

@@ -23,11 +23,11 @@ namespace SQLError
 	void CMD_FORMAT_ERROR::PrintError() const
 	{
 		// ����쳣
-		std::cout << error_info << ErrorInfo;
+		std::cout << error_info << "---" << ErrorInfo << std::endl;
 	}
 	void SQLError::TABLE_ERROR::PrintError() const
 	{
-		std::cout << error_info << ErrorInfo;
+		std::cout << error_info << "---" << ErrorInfo << std::endl;
 	}
 
 }
