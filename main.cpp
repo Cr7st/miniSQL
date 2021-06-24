@@ -12,7 +12,7 @@ void FileGetCommand(string file_name);
 void Help();
 
 int main(){
-    //Init();
+    Init();
     Run();
 }
 
