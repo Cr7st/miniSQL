@@ -398,3 +398,26 @@ void PrintResult::DeleteTuple(int DeleteNum)
         std::cout<<"0 tuple delete!"<<std::endl;
     }
 }
+
+void PrintResult::CreateIndex(bool is_created)
+{
+    if(is_created == 1)
+    {
+        std::cout<<"Index create succeeded!"<<std::endl;
+    }
+    else
+    {
+        std::cout<<"Index create failed!"<<std::endl;
+    }
+}
+void PrintResult::void DropIndex(bool is_dropped)
+{
+    if(is_dropped)
+    {
+         std::cout<<"Index drop succeeded!"<<std::endl;
+    }
+    else
+    {
+        std::cout<<"Index drop failed!"<<std::endl;
+    }
+}
