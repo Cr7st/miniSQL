@@ -210,11 +210,11 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
                     if (*tree.Search(conditions[idx_cond].value) != FileAddr{0, 0})
                         addr_list.push_back(tree.Search(conditions[idx_cond].value));
                 }
-                else if (conditions[idx_cond].op == "<" && conditions[idx_cond].op == "<=")
+                else if (conditions[idx_cond].op == "<" || conditions[idx_cond].op == "<=")
                 {
                     addr_list = tree.LeftSearch(conditions[idx_cond].value);
                 }
-                else if (conditions[idx_cond].op == ">" && conditions[idx_cond].op == ">=")
+                else if (conditions[idx_cond].op == ">" || conditions[idx_cond].op == ">=")
                 {
                     addr_list = tree.RightSearch(conditions[idx_cond].value);
                 }
@@ -305,11 +305,11 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
                     if (*tree.Search(conditions[idx_cond].value) != FileAddr{0, 0})
                         addr_list.push_back(tree.Search(conditions[idx_cond].value));
                 }
-                else if (conditions[idx_cond].op == "<" && conditions[idx_cond].op == "<=")
+                else if (conditions[idx_cond].op == "<" || conditions[idx_cond].op == "<=")
                 {
                     addr_list = tree.LeftSearch(conditions[idx_cond].value);
                 }
-                else if (conditions[idx_cond].op == ">" && conditions[idx_cond].op == ">=")
+                else if (conditions[idx_cond].op == ">" || conditions[idx_cond].op == ">=")
                 {
                     addr_list = tree.LeftSearch(conditions[idx_cond].value);
                 }

@@ -26,6 +26,9 @@ BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTyp
         root_node.node_type = NodeType::ROOT;
         root_node.count_valid_key = 0;
         root_node.next = FileAddr{ 0,0 };
+        for (int i = 0; i < MaxChildCount; i++){
+            root_node.children[i] = FileAddr{0, 0};
+        }
         std::cout << sizeof(root_node) << std::endl;
         FileAddr root_node_fd= pMemFile->AddRecord(&root_node, sizeof(root_node));
 
