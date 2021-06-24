@@ -29,7 +29,6 @@ BPTree::BPTree(const std::string idx_name, const std::string tb_name, int KeyTyp
         for (int i = 0; i < MaxChildCount; i++){
             root_node.children[i] = FileAddr{0, 0};
         }
-        std::cout << sizeof(root_node) << std::endl;
         FileAddr root_node_fd= pMemFile->AddRecord(&root_node, sizeof(root_node));
 
         // 初始化其他索引文件头信息
@@ -311,11 +310,9 @@ std::vector<FileAddr*> BPTree::LeftSearch(DataClass high_key) {
     BTNode* Node = FileAddrToMemPtr(*pfilefd);
     BTNode* root = Node;
     FileAddr Addr = *pfilefd;
-    std::cout<<"("<<root->count_valid_key;
     while(root->children[root->count_valid_key] != FileAddr{0, 0} && Node->node_type != NodeType::LEAF) {
         Addr = Node->children[0];
         Node = FileAddrToMemPtr(Addr);
-        std::cout<<Node->count_valid_key;
     }
     std::vector<FileAddr*> AddrRes;
     while(Addr != FileAddr{0, 0}){

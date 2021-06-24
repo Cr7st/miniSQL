@@ -75,8 +75,11 @@ bool DropTable(std::string table_name)
         remove(dbf.c_str());
         return true;
     }
-    else
-        return false;
+    else{
+        std::string e("There is no such table named ");
+        e = e + table_name;
+        throw SQLError::TABLE_ERROR(e);
+    }
 }
 
 bool InsertTuple(std::string table_name, std::vector<DataClass> &list)
@@ -138,13 +141,10 @@ bool InsertTuple(std::string table_name, std::vector<DataClass> &list)
         return true;
     }
     else
-    {
-        try{
-            throw SQLError::TABLE_ERROR(std::string("There is no such table!  "));
-        }
-        catch(SQLError::TABLE_ERROR e){
-            e.PrintError();
-        }
+    {   
+        std::string e("There is no such table named ");
+        e += table_name;
+        throw SQLError::TABLE_ERROR(e);
         return false;
     }
 }
@@ -200,15 +200,11 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
         if (conditions.size() == 0)
         {
             addr_list = tree.AllSearch();
-            #ifdef DEBUG
-            std::cout<<"ggg";
-            #endif
         }
         else
         {
             if (found_index)
             {
-                std::cout<<"("<<conditions[idx_cond].op<<")";
                 if (conditions[idx_cond].op == "=")
                 {
                     if (*tree.Search(conditions[idx_cond].value) != FileAddr{0, 0})
@@ -222,8 +218,6 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
                 {
                     addr_list = tree.RightSearch(conditions[idx_cond].value);
                 }
-                else
-                    std::cout<<"Fuck u";
             }
             else
             {
@@ -246,14 +240,9 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
     #ifdef DEBUG
         std::cout<<"noo";
     #endif
-        try{
-            std::string e("There is no such table named ");
-            e = e + table_name;
-            throw SQLError::TABLE_ERROR(e);
-        }
-        catch(SQLError::TABLE_ERROR e){
-            e.PrintError();
-        }
+        std::string e("There is no such table named ");
+        e = e + table_name;
+        throw SQLError::TABLE_ERROR(e);
     }
 }
 
@@ -344,6 +333,7 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
                             i--;//addr_list中存的是指针，tree中删除后，addr_list中也会少
                                                         //若删除的是最后一个，则没有影响
                             addr_list.pop_back();
+                            //std::cout << addr_list.size() << std::endl;
                         }
                     }
                 }
@@ -351,18 +341,15 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
                 deleteNumber++;
             }
         }
-        std::cout<<"成功删除 "<< deleteNumber <<" 条记录！";
+        std::cout<<"Successfully deleted "<< deleteNumber << " tuples!" << std::endl;
         //RecordManager.GetSelectRS(result_set);
         return true;
     }
     else
     {
-        try {
-            throw SQLError::TABLE_ERROR();
-        }
-        catch(SQLError::TABLE_ERROR e){
-            e.PrintError();
-        }
+        std::string e("There is no such table named ");
+        e += table_name;
+        throw SQLError::TABLE_ERROR(e);
     }
 }
 
