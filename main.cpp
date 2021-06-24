@@ -4,6 +4,7 @@
 #include <fstream>
 #include "Interpreter.h"
 #include <time.h>
+#include <stdexcept>
 #define TIME_MEASURE
 using namespace std;
 
@@ -69,7 +70,7 @@ void Run()
             }
             #ifdef TIME_MEASURE
             finish = clock();
-            cout<<"Time: "<<(double)(finish-start)/CLOCK_PER_SEC<<" seconds"<<endl;
+            cout<<"Time: "<<(double)(finish-start)/CLOCKS_PER_SEC<<" seconds"<<endl;
             #endif
         }
     }
@@ -142,7 +143,7 @@ void FileGetCommand(string file_name)
     cout << "All query executed!" << endl;
     #ifdef TIME_MEASURE
         finish = clock();
-        cout<<"Total time: "<<(double)(finish-start)/CLOCK_PER_SEC<<" seconds"<<endl;
+        cout<<"Total time: "<<(double)(finish-start)/CLOCKS_PER_SEC<<" seconds"<<endl;
      #endif
     in_file.close();
 }

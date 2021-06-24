@@ -223,7 +223,7 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
                     addr_list = tree.RightSearch(conditions[idx_cond].value);
                 }
                 else
-                    std::cout<<"Fcuk u";
+                    std::cout<<"Fuck u";
             }
             else
             {
