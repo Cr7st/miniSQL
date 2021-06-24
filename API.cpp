@@ -88,6 +88,9 @@ bool InsertTuple(std::string table_name, std::vector<DataClass> &list)
         TableInfo &info = CatalogManager.LookUpTableInfo(table_name);
         for (int i = 0; i < info.n_columns(); i++)
         {
+            if (list[i].type != info[i].type){
+                throw SQLError::TABLE_ERROR(std::string("Data type error!"));
+            }
             if (info[i].is_unique || info[i].is_PK)
             {
                 // if the column is unique all a primary key, should check duplication
@@ -160,10 +163,12 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
         std::vector<Tuple> result_set;
         for (int i = 0; i < conditions.size(); i++)
         {
+            bool attr_check = false;
             for (int j = 0; j < table_info.n_columns(); j++)
             {
                 if (table_info[j].column_name == conditions[i].attr)
                 {
+                    attr_check = true;
                     if (table_info[j].has_index)
                     {
                         tree = BPTree(table_info.GetIndexName(j));
@@ -178,6 +183,11 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
                         break;
                     }
                 }
+            }
+            if (attr_check == false){
+                std::string e("There is no attribute named ");
+                e += conditions[i].attr;
+                throw SQLError::TABLE_ERROR(e);
             }
             if (found_index)
             {
@@ -249,8 +259,10 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
         std::vector<Tuple> result_set;
         for (int i = 0; i < conditions.size(); i++)
         {
+            bool attr_check = false;
             for (int j = 0; j < table_info.n_columns(); j++)
             {
+                attr_check = true;
                 if (table_info[j].column_name == conditions[i].attr)
                 {
                     if (table_info[j].has_index)
@@ -261,6 +273,11 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
                         break;
                     }
                 }
+            }
+            if (attr_check == false){
+                std::string e("There is no attribute named ");
+                e += conditions[i].attr;
+                throw SQLError::TABLE_ERROR(e);
             }
             if (found_index)
             {

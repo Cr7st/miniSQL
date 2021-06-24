@@ -23,8 +23,9 @@ union Data{
 };
 
 class DataClass{
-private:
+public:
     DataType type;
+private:
     int bytes;
     union Data data;
 public:
