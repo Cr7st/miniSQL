@@ -293,7 +293,8 @@ void PrintResult::SelectTuple(std::string table_name, std::vector<Tuple> tuple)
 {
     cout<<tuple.size();
    std::cout<<"====="<<table_name<<"====="<<std::endl;
-   CM CatalogManager;
+   extern CM CatalogManager;
+// CM CatalogManager;
    TableInfo &table_info = CatalogManager.LookUpTableInfo(table_name);
    if(tuple.size() == 0)
    {
@@ -334,5 +335,28 @@ void PrintResult::DeleteTuple(int DeleteNum)
     else
     {
         std::cout<<"0 tuple delete!"<<std::endl;
+    }
+}
+
+void PrintResult::CreateIndex(bool is_created)
+{
+    if(is_created == 1)
+    {
+        std::cout<<"Index create succeeded!"<<std::endl;
+    }
+    else
+    {
+        std::cout<<"Index create failed!"<<std::endl;
+    }
+}
+void PrintResult::void DropIndex(bool is_dropped)
+{
+    if(is_dropped)
+    {
+         std::cout<<"Index drop succeeded!"<<std::endl;
+    }
+    else
+    {
+        std::cout<<"Index drop failed!"<<std::endl;
     }
 }

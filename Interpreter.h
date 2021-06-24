@@ -38,6 +38,8 @@ public:
     void SelectTuple(std::string table_name, std::vector<Tuple> tuple);
     void InsertTuple(bool is_inserted);
     void DeleteTuple(int DeleteNum);
+    void CreateIndex(bool is_created);
+    void DropIndex(bool is_dropped);
 };
 
 
