@@ -46,8 +46,8 @@ bool CM::NewInfoCheck(TableInfo &table)
 }
 
 
-TableInfo CM::InitTableInfo(std::string table_name, std::vector<std::string> &column_names, 
-                             std::vector<std::string> &data_types, int PK_index)
+TableInfo CM::InitTableInfo(std::string table_name, std::vector<std::string> &column_names,
+                            std::vector<std::string> &data_types, int PK_index)
 {
     if (column_names.size() > 15){
         std::string e("To many attributes!");

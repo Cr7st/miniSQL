@@ -10,9 +10,11 @@ DataClass convert(string value){
         if(value[i] == '.')  n++;
         else if(value[i] < '0' || value[i] > '9') break;
     DataClass ptr;
-    if(i<value.length()) ptr = DataClass(atoi(value.c_str()));
-    else if(n==1) ptr = DataClass(atof(value.c_str()));
-    else ptr = DataClass(value.c_str());
+    if(value[0] == '\'' && value[value.size()-1] == '\'' || value[0] == '\"' && value[value.size()-1] == '\"')
+        ptr = DataClass(value), cout<<"a";
+    else if(i==value.length() && n==0) ptr = DataClass(atoi(value.c_str())), cout<<"b";
+    else if(n==1) ptr = DataClass(atof(value.c_str())), cout<<"c";
+    else ptr = DataClass(value.c_str()), cout<<"d";
     return ptr;
 }
 
@@ -70,7 +72,12 @@ void Select(string command){
         }
     }
     PrintResult res;
-    res.SelectTuple(table, SelectTuples(condition, table));
+    try {
+        res.SelectTuple(table, SelectTuples(condition, table));
+    }
+    catch(SQLError::TABLE_ERROR e){
+        e.PrintError();
+    }
 }
 
 void Insert(string command){
@@ -79,15 +86,16 @@ void Insert(string command){
     vector<DataClass> content;
     string table;
     command = DeleteSpace(command.substr(11));
-    for (i = 0; command[i] != '('; i++);
+    for (i = 0; command[i] != ' '; i++);
     table = command.substr(0, i);
-    command = DeleteSpace(command.substr(i+1));
+    cout<<table;
+    /*command = DeleteSpace(command.substr(i+1));
     while(1) {
         for (i = 0; command[i] != ',' && command[i] != ' '&& command[i] != ')'; i++);
         attr.push_back(command.substr(0, i));
         if(command[i] == ')') break;
         command = DeleteSpace(command.substr(i + (command[i] == ' ')));
-    }
+    }*/
     for (i = 0; command[i] != '('; i++);
     command = DeleteSpace(command.substr(i+1));
     while(1) {
@@ -98,11 +106,12 @@ void Insert(string command){
         if(command[i] == ')') break;
         command = DeleteSpace(command.substr(i + (command[i] == ' ')));
     }
-    if(attr.size() != content.size())
-        cout<<"The number of parameters is wrong\n";
-    else {
-        PrintResult res;
+    PrintResult res;
+    try{
         res.InsertTuple(InsertTuple(table, content));
+    }
+    catch(SQLError::TABLE_ERROR e){
+        e.PrintError();
     }
 }
 
@@ -145,7 +154,12 @@ void Delete(string command){
                 command = DeleteSpace(command.substr(3));
         }
     }
-    DeleteTuples(condition, table);
+    try{
+        DeleteTuples(condition, table);
+    }
+    catch(SQLError::TABLE_ERROR e){
+        e.PrintError();
+    }
 }
 
 void Create(string command){
@@ -166,6 +180,7 @@ void Create(string command){
         for (i = 0; command[i] != '('; i++);
         string table = command.substr(0, i);
         trim(table);
+        command = DeleteSpace(command.substr(i+1));
         for(int j=0; ; j++){
             for (i = 0; command[i] != ' '; i++);
             string attr = command.substr(0, i);
@@ -173,7 +188,6 @@ void Create(string command){
             command = DeleteSpace(command.substr(i));
             for (i = 0; command[i] != ',' && command[i] != ' ' && command[i] != ')'; i++);
             string type = command.substr(0, i);
-            cout<<type<<"fsfs";
             for (string::iterator it = type.begin(); it < type.end(); it++){
                 if (*it == '(' || *it == ')')
                 {
@@ -184,14 +198,18 @@ void Create(string command){
             trim(type);
             types.push_back(type);
             command = DeleteSpace(command.substr(i));
-            cout<<"("<<command.substr(0,7)<<")";
             if(primary == -1 && command.substr(0, 7)=="primary") {
                 primary = j;
                 command = DeleteSpace(command.substr(7));
             }
             if(command[0] == ';') break;
         }
-        CreateTable(table, property, types, primary);
+        try{
+            CreateTable(table, property, types, primary);
+        }
+        catch(SQLError::TABLE_ERROR e){
+            e.PrintError();
+        }
     }
     else if(command.substr(0, 5)=="index"){
         command = DeleteSpace(command.substr(5));
@@ -205,7 +223,12 @@ void Create(string command){
             for (j = 0; command[j] == ' ' || command[j] == '('; j++);
             for (i = j; command[i] != ' ' && command[i] != ')'; i++);
             string column = command.substr(i, j);
-            CreateIndex(table, index, column);
+            try{
+                CreateIndex(table, index, column);
+            }
+            catch(SQLError::TABLE_ERROR e){
+                e.PrintError();
+            }
         }
         else
             cout<<"Sorry, MiniSQL can't interpret your command, try again\n";
