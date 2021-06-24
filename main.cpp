@@ -52,11 +52,11 @@ void Run()
             file_name = file_name + ".sql";
             command_set = FileGetCommand(file_name);
             for (int i = 0; i < command_set.size(); i++){
-                //Interpreter(command_set[i]);
+                Interpreter(command_set[i]);
             }
         }
         else{
-            //Interpreter(command);
+            Interpreter(command);
         }
     }
 }

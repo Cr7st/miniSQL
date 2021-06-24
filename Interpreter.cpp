@@ -2,7 +2,9 @@
 // Created by 86152 on 2021/6/20.
 //
 #include "Interpreter.h"
+
 using namespace std;
+extern CM CatalogManager;
 
 DataClass convert(string value){
     int n = 0, i = 0;
