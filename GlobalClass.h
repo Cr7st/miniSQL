@@ -41,6 +41,7 @@ public:
     friend std::ostream& operator<<(std::ostream &out, const DataClass &obj);
     friend class Tuple;
     friend class RM;
+    friend class PrintResult;
 };
 
 

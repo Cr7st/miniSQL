@@ -13,7 +13,7 @@ DataClass convert(string value){
         else if(value[i] < '0' || value[i] > '9') break;
     DataClass ptr;
     if(value[0] == '\'' && value[value.size()-1] == '\'' || value[0] == '\"' && value[value.size()-1] == '\"')
-        ptr = DataClass(value), cout<<"a";
+        ptr = DataClass(value.substr(1, value.length() - 2)), cout<<"a";
     else if(i==value.length() && n==0) ptr = DataClass(atoi(value.c_str())), cout<<"b";
     else if(n==1) ptr = DataClass(atof(value.c_str())), cout<<"c";
     else ptr = DataClass(value.c_str()), cout<<"d";
@@ -343,7 +343,14 @@ void PrintResult::SelectTuple(std::string table_name, std::vector<Tuple> tuple)
         {
             for(int j = 0; j<table_info.n_columns();j++)
             {
-                cout<<tuple[i].data_list[j]<<"\t";
+                if(tuple[i].data_list[j].type == DataType::INT)
+                    std::cout<<tuple[i].data_list[j].data.i<<"\t";
+                else if(tuple[i].data_list[j].type == DataType::FLOAT)
+                    std::cout<<tuple[i].data_list[j].data.f<<"\t";
+                else if(tuple[i].data_list[j].type == DataType::CHAR){
+                    std::string s(tuple[i].data_list[j].data.str);
+                    std::cout << s << "\t";
+                }
             }
             std::cout<<endl;
         }
