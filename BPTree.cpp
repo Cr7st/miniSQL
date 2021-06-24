@@ -351,14 +351,19 @@ std::vector<FileAddr*> BPTree::LeftSearch(DataClass high_key) {
 std::vector<FileAddr*> BPTree::RightSearch(DataClass low_key) {
     auto pMemPage = GetGlobalClock()->GetMemAddr(file_id, 0);
     auto pfilefd = (FileAddr*)pMemPage->GetFileHeadInfo()->reserve;  // 找到根结点的地址
-    FileAddr Addr = *Search(low_key);
-    BTNode* Node;
+    BTNode* Node = FileAddrToMemPtr(*pfilefd);
+    BTNode* root = Node;
+    FileAddr Addr = *pfilefd;
+    while(root->children[root->count_valid_key] != FileAddr{0, 0} && Node->node_type != NodeType::LEAF) {
+        Addr = Node->children[0];
+        Node = FileAddrToMemPtr(Addr);
+    }
     std::vector<FileAddr*> AddrRes;
-    std::cout<<"rnm";
     while(Addr != FileAddr{0, 0}){
         Node = FileAddrToMemPtr(Addr);
-        for(int i = 0; i < Node->count_valid_key; i++) {
-            AddrRes.push_back(Node->children+i);
+        for(int i = 0; i <Node->count_valid_key; i++) {
+            if(Node->key[i] >= low_key)
+                AddrRes.push_back(Node->children + i);
         }
         Addr = Node->next;
     }
