@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include "Interpreter.h"
+#include <time.h>
 using namespace std;
 
 void Init();
@@ -55,12 +56,20 @@ void Run()
             cout << "file closed" << endl;
         }
         else{
+            #ifdef TIME_MEASURE
+            clock_t start, finish;
+            start = clock();
+            #endif
             try{
                 Interpreter(command);
             }
             catch(std::out_of_range){
-                cout << "We cannot interpret your input. Please try agian." << endl;
+                cout << "We cannot interpret your input. Please try again." << endl;
             }
+            #ifdef TIME_MEASURE
+            finish = clock();
+            cout<<"Time: "<<(double)(finish-start)/CLOCK_PER_SEC<<" seconds"<<endl;
+            #endif
         }
     }
 }
@@ -108,6 +117,10 @@ void FileGetCommand(string file_name)
     vector<string> command_set;
     ifstream in_file;
     in_file.open("../" + file_name);
+    #ifdef TIME_MEASURE
+        clock_t start, finish;
+        start = clock();
+    #endif
     while (!in_file.eof()){
         string tmp;
         string res;
@@ -122,9 +135,13 @@ void FileGetCommand(string file_name)
             Interpreter(res);
         }
         catch(std::out_of_range){
-            cout << "We cannot interpret your input. Please try agian." << endl;
+            cout << "We cannot interpret your input. Please try again." << endl;
         }
     }
     cout << "All query executed!" << endl;
+    #ifdef TIME_MEASURE
+        finish = clock();
+        cout<<"Total time: "<<(double)(finish-start)/CLOCK_PER_SEC<<" seconds"<<endl;
+     #endif
     in_file.close();
 }

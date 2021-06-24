@@ -200,7 +200,9 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
         if (conditions.size() == 0)
         {
             addr_list = tree.AllSearch();
+            #ifdef DEBUG
             std::cout<<"ggg";
+            #endif
         }
         else
         {
@@ -225,7 +227,9 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
             }
             else
             {
+                #ifdef DEBUG
                 std::cout<<"(all)";
+                #endif
                 addr_list = tree.AllSearch();
             }
         }
@@ -239,7 +243,9 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
     }
     else
     {
+    #ifdef DEBUG
         std::cout<<"noo";
+    #endif
         try{
             std::string e("There is no such table named ");
             e = e + table_name;
@@ -345,7 +351,7 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
                 deleteNumber++;
             }
         }
-        std::cout<<"成功删除"<< deleteNumber <<"条记录！";
+        std::cout<<"成功删除 "<< deleteNumber <<" 条记录！";
         //RecordManager.GetSelectRS(result_set);
         return true;
     }
