@@ -14,7 +14,7 @@ DataClass convert(string value){
     DataClass ptr;
     if(i<value.length()) ptr = DataClass(atoi(value.c_str()));
     else if(n==1) ptr = DataClass(atof(value.c_str()));
-    else ptr = DataClass(value.c_str());
+    else ptr = DataClass(value);
     return ptr;
 }
 
@@ -101,10 +101,15 @@ void Insert(string command){
         command = DeleteSpace(command.substr(i + (command[i] == ' ')));
     }
     if(attr.size() != content.size())
-        cout<<"The number of parameters is wrong\n";
+        std::cout<<"The number of parameters is wrong\n";
     else {
         PrintResult res;
-        res.InsertTuple(InsertTuple(table, content));
+        try{
+            res.InsertTuple(InsertTuple(table, content));
+        }
+        catch(SQLError::TABLE_ERROR e){
+            e.PrintError();
+        }
     }
 }
 
@@ -167,6 +172,7 @@ void Create(string command){
         command = DeleteSpace(command.substr(5));
         for (i = 0; command[i] != '('; i++);
         string table = command.substr(0, i);
+        command = DeleteSpace(command.substr(i+1));
         trim(table);
         for(int j=0; ; j++){
             for (i = 0; command[i] != ' '; i++);

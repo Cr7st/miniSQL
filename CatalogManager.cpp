@@ -90,6 +90,9 @@ TableInfo CM::InitTableInfo(std::string table_name, std::vector<std::string> &co
             std::string str_size = data_types[i].substr(4, data_types[i].length() - 4);
             column.bytes = atoi(str_size.c_str()) * sizeof(char);
         }
+        else{
+            throw SQLError::TABLE_ERROR("Attribute type error!");
+        }
         table.columns.push_back(column);
     }
     table.columns[PK_index].is_PK = true;
