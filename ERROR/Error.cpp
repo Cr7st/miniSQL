@@ -7,7 +7,7 @@ namespace SQLError
 	void BaseError::PrintError() const
 	{
 		// ����쳣
-		std::cout << ErrorInfo;
+		std::cout << ErrorInfo << std::endl;
 	}
 
 	void BaseError::WriteToLog()const

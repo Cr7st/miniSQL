@@ -13,10 +13,10 @@ DataClass convert(string value){
         else if(value[i] < '0' || value[i] > '9') break;
     DataClass ptr;
     if(value[0] == '\'' && value[value.size()-1] == '\'' || value[0] == '\"' && value[value.size()-1] == '\"')
-        ptr = DataClass(value.substr(1, value.length() - 2)), cout<<"a";
-    else if(i==value.length() && n==0) ptr = DataClass(atoi(value.c_str())), cout<<"b";
-    else if(n==1) ptr = DataClass(atof(value.c_str())), cout<<"c";
-    else ptr = DataClass(value.c_str()), cout<<"d";
+        ptr = DataClass(value.substr(1, value.length() - 2)), std::cout<<"a";
+    else if(i==value.length() && n==0) ptr = DataClass(atoi(value.c_str())), std::cout<<"b";
+    else if(n==1) ptr = DataClass(atof(value.c_str())), std::cout<<"c";
+    else ptr = DataClass(value.c_str()), std::cout<<"d";
     return ptr;
 }
 
@@ -48,7 +48,7 @@ void Select(string command){
     for(i=0; command[i]!=' '; i++) ;
     table = command.substr(0, i);
     command = DeleteSpace(command.substr(i));
-    cout<<"("<<table;
+    std::cout<<"("<<table;
     if(command.find("where") != std::string::npos){
         command = DeleteSpace(command.substr(5));
         while(1)
@@ -57,7 +57,7 @@ void Select(string command){
                         command[i] != '>'; i++);
             string attr = command.substr(0, i);
             trim(attr);
-            cout<<attr;
+            std::cout<<attr;
             command = DeleteSpace(command.substr(i));
             string op = command.substr(0,1);
             if (command[1] == '=') op += "=";
@@ -82,6 +82,9 @@ void Select(string command){
     catch(SQLError::TABLE_ERROR e){
         e.PrintError();
     }
+    catch(...){
+        std::cout << "An error took place!" << std::endl;
+    }
 }
 
 void Insert(string command){
@@ -92,7 +95,7 @@ void Insert(string command){
     command = DeleteSpace(command.substr(11));
     for (i = 0; command[i] != ' '; i++);
     table = command.substr(0, i);
-    cout<<table;
+    std::cout<<table;
     /*command = DeleteSpace(command.substr(i+1));
     while(1) {
         for (i = 0; command[i] != ',' && command[i] != ' '&& command[i] != ')'; i++);
@@ -104,7 +107,7 @@ void Insert(string command){
     command = DeleteSpace(command.substr(i+1));
     while(1) {
         for (i = 0; command[i] != ','&& command[i] != ')'; i++);
-        cout<<"("+command.substr(0, i)+")";
+        std::cout<<"("+command.substr(0, i)+")";
         DataClass ptr = convert(command.substr(0, i));
         content.push_back(ptr);
         if(command[i] == ')') break;
@@ -118,6 +121,12 @@ void Insert(string command){
     }
     catch(SQLError::TABLE_ERROR e){
         e.PrintError();
+    }
+    catch(SQLError::KEY_INSERT_ERROR e){
+        e.PrintError();
+    }
+    catch(...){
+        std::cout << "An error took place!" << std::endl;
     }
 }
 
@@ -144,7 +153,7 @@ void Delete(string command){
                         command[i] != '>'; i++);
             string attr = command.substr(0, i);
             trim(attr);
-            cout<<attr;
+            std::cout<<attr;
             command = DeleteSpace(command.substr(i));
             string op = command.substr(0,1);
             if (command[1] == '=') op += "=";
@@ -166,6 +175,9 @@ void Delete(string command){
     }
     catch(SQLError::TABLE_ERROR e){
         e.PrintError();
+    }
+    catch(...){
+        std::cout << "An error took place!" << std::endl;
     }
 }
 
@@ -217,6 +229,9 @@ void Create(string command){
         catch(SQLError::TABLE_ERROR e){
             e.PrintError();
         }
+        catch(...){
+            std::cout << "An error took place!" << std::endl;
+        }
     }
     else if(command.substr(0, 5)=="index"){
         command = DeleteSpace(command.substr(5));
@@ -236,34 +251,45 @@ void Create(string command){
             catch(SQLError::TABLE_ERROR e){
                 e.PrintError();
             }
+            catch(...){
+                std::cout << "An error took place!" << std::endl;
+            }
         }
         else
-            cout<<"Sorry, MiniSQL can't interpret your command, try again\n";
+            std::cout<<"Sorry, MiniSQL can't interpret your command, try again\n";
     }
     else
-        cout<<"Sorry, MiniSQL can't interpret your command, try again\n";
+        std::cout<<"Sorry, MiniSQL can't interpret your command, try again\n";
 }
 
 void Drop(string command){
     int i, j;
     command = DeleteSpace(command.substr(4));
-    if(command.substr(0, 8)=="database"){
-        cout<<"Successfully Drop!";
+    try{
+        if(command.substr(0, 8)=="database"){
+            std::cout<<"Successfully Drop!";
+        }
+        else if(command.substr(0, 5)=="table"){
+            command = DeleteSpace(command.substr(5));
+            trim(command);
+            if(DropTable(command))
+                std::cout<<"Successfully Drop!";
+        }
+        else if(command.substr(0, 5)=="index"){
+            command = DeleteSpace(command.substr(5));
+            trim(command);
+            if(DropIndex(command))
+                std::cout<<"Successfully Drop!";
+        }
+        else
+            std::cout<<"Sorry, MiniSQL can't interpret your command, try again\n";
     }
-    else if(command.substr(0, 5)=="table"){
-        command = DeleteSpace(command.substr(5));
-        trim(command);
-        if(DropTable(command))
-            cout<<"Successfully Drop!";
+    catch(SQLError::TABLE_ERROR e){
+        e.PrintError();
     }
-    else if(command.substr(0, 5)=="index"){
-        command = DeleteSpace(command.substr(5));
-        trim(command);
-        if(DropIndex(command))
-            cout<<"Successfully Drop!";
+    catch(...){
+        std::cout << "An error took place!" << std::endl;
     }
-    else
-        cout<<"Sorry, MiniSQL can't interpret your command, try again\n";
 }
 
 void Interpreter(std::string command){
@@ -278,7 +304,7 @@ void Interpreter(std::string command){
     else if(command.substr(0,4) == "drop")
         Drop(command);
     else
-        cout<<"Sorry, MiniSQL can't interpret your command, try again\n";
+        std::cout<<"Sorry, MiniSQL can't interpret your command, try again\n";
 }
 
 
@@ -321,7 +347,7 @@ void PrintResult::InsertTuple(bool is_inserted)
 
 void PrintResult::SelectTuple(std::string table_name, std::vector<Tuple> tuple)
 {
-    cout<<tuple.size();
+    std::cout<<tuple.size();
     std::cout<<"====="<<table_name<<"====="<<std::endl;
     TableInfo &table_info = CatalogManager.LookUpTableInfo(table_name);
     if(tuple.size() == 0)
