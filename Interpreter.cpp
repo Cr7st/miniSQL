@@ -50,6 +50,7 @@ void Select(string command){
     command = DeleteSpace(command.substr(i));
     cout<<"("<<table;
     if(command.find("where") != std::string::npos){
+        command = DeleteSpace(command.substr(5));
         while(1)
         {
             for (i = 0; i < command.length() && command[i] != '!' && command[i] != '=' && command[i] != '<' &&
@@ -75,7 +76,8 @@ void Select(string command){
     }
     PrintResult res;
     try {
-        //res.SelectTuple(table, SelectTuples(condition, table));
+        std::vector<Tuple> result_set = SelectTuples(condition, table);
+        res.SelectTuple(table, result_set);
     }
     catch(SQLError::TABLE_ERROR e){
         e.PrintError();
@@ -135,6 +137,7 @@ void Delete(string command){
     table = command.substr(0, i);
     command = DeleteSpace(command.substr(i));
     if(command.find("where") != std::string::npos){
+        command = DeleteSpace(command.substr(5));
         while(1)
         {
             for (i = 0; i < command.length() && command[i] != '!' && command[i] != '=' && command[i] != '<' &&
@@ -319,32 +322,31 @@ void PrintResult::InsertTuple(bool is_inserted)
 void PrintResult::SelectTuple(std::string table_name, std::vector<Tuple> tuple)
 {
     cout<<tuple.size();
-   std::cout<<"====="<<table_name<<"====="<<std::endl;
-   CM CatalogManager;
-   TableInfo &table_info = CatalogManager.LookUpTableInfo(table_name);
-   if(tuple.size() == 0)
-   {
-       std::cout<<" ----- empty -----"<<std::endl;
-       return;
-   }
-   else
-   {
-       //打印列名
-       for(int i  = 0;i<table_info.n_columns();i++)
-       {
-           std::cout<< "|" <<table_info[i].column_name<<"\t";
-       }
-       std::cout<<endl;
-       //分割线
-       //打印每一条记录
-       for(int i = 0;i<tuple.size();i++)
-       {
-           for(int j = 0; j<table_info.n_columns();j++)
-           {
-               cout<<tuple[i].data_list[j]<<"\t";
-           }
-           std::cout<<endl;
-       }
+    std::cout<<"====="<<table_name<<"====="<<std::endl;
+    TableInfo &table_info = CatalogManager.LookUpTableInfo(table_name);
+    if(tuple.size() == 0)
+    {
+        std::cout<<" ----- empty -----"<<std::endl;
+        return;
+    }
+    else
+    {
+        //打印列名
+        for(int i  = 0;i<table_info.n_columns();i++)
+        {
+            std::cout<< "|" <<table_info[i].column_name<<"\t";
+        }
+        std::cout<< std::endl;
+        //分割线
+        //打印每一条记录
+        for(int i = 0;i<tuple.size();i++)
+        {
+            for(int j = 0; j<table_info.n_columns();j++)
+            {
+                cout<<tuple[i].data_list[j]<<"\t";
+            }
+            std::cout<<endl;
+        }
    }
 }
 

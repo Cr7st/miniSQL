@@ -235,7 +235,9 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
     {
         std::cout<<"noo";
         try{
-            throw SQLError::TABLE_ERROR();
+            std::string e("There is no such table named ");
+            e = e + table_name;
+            throw SQLError::TABLE_ERROR(e);
         }
         catch(SQLError::TABLE_ERROR e){
             e.PrintError();
