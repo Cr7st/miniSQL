@@ -207,7 +207,8 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
             {
                 if (conditions[idx_cond].op == "=")
                 {
-                    addr_list.push_back(tree.Search(conditions[idx_cond].value));
+                    if (*tree.Search(conditions[idx_cond].value) != FileAddr{0, 0})
+                        addr_list.push_back(tree.Search(conditions[idx_cond].value));
                 }
                 else if (conditions[idx_cond].op == "<" && conditions[idx_cond].op == "<=")
                 {
@@ -301,7 +302,8 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
             {
                 if (conditions[idx_cond].op == "=")
                 {
-                    addr_list.push_back(tree.Search(conditions[idx_cond].value));
+                    if (*tree.Search(conditions[idx_cond].value) != FileAddr{0, 0})
+                        addr_list.push_back(tree.Search(conditions[idx_cond].value));
                 }
                 else if (conditions[idx_cond].op == "<" && conditions[idx_cond].op == "<=")
                 {
