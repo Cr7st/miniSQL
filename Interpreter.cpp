@@ -75,7 +75,7 @@ void Select(string command){
     }
     PrintResult res;
     try {
-        res.SelectTuple(table, SelectTuples(condition, table));
+        //res.SelectTuple(table, SelectTuples(condition, table));
     }
     catch(SQLError::TABLE_ERROR e){
         e.PrintError();
@@ -108,16 +108,14 @@ void Insert(string command){
         if(command[i] == ')') break;
         command = DeleteSpace(command.substr(i + (command[i] == ' ')));
     }
-    if(attr.size() != content.size())
-        std::cout<<"The number of parameters is wrong\n";
-    else {
-        PrintResult res;
-        try{
-            res.InsertTuple(InsertTuple(table, content));
-        }
-        catch(SQLError::TABLE_ERROR e){
-            e.PrintError();
-        }
+    // if(attr.size() != content.size())
+    //     std::cout<<"The number of parameters is wrong\n";
+    PrintResult res;
+    try{
+        res.InsertTuple(InsertTuple(table, content));
+    }
+    catch(SQLError::TABLE_ERROR e){
+        e.PrintError();
     }
 }
 
@@ -187,7 +185,6 @@ void Create(string command){
         string table = command.substr(0, i);
         command = DeleteSpace(command.substr(i+1));
         trim(table);
-        command = DeleteSpace(command.substr(i+1));
         for(int j=0; ; j++){
             for (i = 0; command[i] != ' '; i++);
             string attr = command.substr(0, i);
