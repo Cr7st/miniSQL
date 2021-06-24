@@ -98,5 +98,5 @@ bool DataClass::operator>=(const DataClass &rhs)
 }
 bool DataClass::operator>(const DataClass &rhs)
 {
-    return !(*this >= rhs);
+    return !(*this <= rhs);
 }
