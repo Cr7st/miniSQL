@@ -90,8 +90,8 @@ void Help()
 	cout << R"(|Create database  : create database STU;                                                         |)" << std::endl;
 	cout << R"(|Use database     : use database STU;                                                            |)" << std::endl;
 	cout << R"(|Show database    : show databases;                                                              |)" << std::endl;
-	cout << R"(|Create Table     : create table student(id int primary, score double, name char(20));           |)" << std::endl;
-	cout << R"(|Insert Record(1) : insert into student(id,score,name)values(1,95.5,ZhangSan);                   |)" << std::endl;
+	cout << R"(|Create Table     : create table student(id int primary, score float, name char(20));           |)" << std::endl;
+	cout << R"(|Insert Record(1) : insert into student values(1,95.5,ZhangSan);                   |)" << std::endl;
 	cout << R"(|Insert Record(2) : insert into student(id,name)values(2,LiSi); Note:LiSi has no score           |)" << std::endl;
 	cout << R"(|Delete Table     : delete from student where id = 1; Note: ZhangSan is deleted                  |)" << std::endl;
 	cout << R"(|Select Table(1)  : select * from student where id = 2;                                          |)" << std::endl;
