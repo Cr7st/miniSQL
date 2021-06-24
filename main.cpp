@@ -8,7 +8,7 @@ using namespace std;
 void Init();
 void Run();
 string ConsoleGetCommand();
-vector<string> FileGetCommand(string file_name);
+void FileGetCommand(string file_name);
 void Help();
 
 int main(){
@@ -50,14 +50,17 @@ void Run()
         else if (command == "file;"){
             cout << "Please enter the query file name:" << endl;
             cin >> file_name;
-            file_name = file_name + ".sql";
-            command_set = FileGetCommand(file_name);
-            for (int i = 0; i < command_set.size(); i++){
-                Interpreter(command_set[i]);
-            }
+            file_name = file_name;
+            FileGetCommand(file_name);
+            cout << "file closed" << endl;
         }
         else{
-            Interpreter(command);
+            try{
+                Interpreter(command);
+            }
+            catch(std::out_of_range){
+                cout << "We cannot interpret your input. Please try agian." << endl;
+            }
         }
     }
 }
@@ -100,11 +103,11 @@ void Help()
 	cout << R"(+------------------------------------------------------------------------------------------------+)" << std::endl;
 }
 
-vector<string> FileGetCommand(string file_name)
+void FileGetCommand(string file_name)
 {
     vector<string> command_set;
     ifstream in_file;
-    in_file.open(file_name);
+    in_file.open("../" + file_name);
     while (!in_file.eof()){
         string tmp;
         string res;
@@ -115,7 +118,13 @@ vector<string> FileGetCommand(string file_name)
         }
         res = res + " " + tmp;
         res.erase(0, 1);
-        command_set.push_back(res);
+        try{
+            Interpreter(res);
+        }
+        catch(std::out_of_range){
+            cout << "We cannot interpret your input. Please try agian." << endl;
+        }
     }
-    return command_set;
+    cout << "All query executed!" << endl;
+    in_file.close();
 }

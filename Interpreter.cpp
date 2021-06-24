@@ -410,7 +410,7 @@ void PrintResult::CreateIndex(bool is_created)
         std::cout<<"Index create failed!"<<std::endl;
     }
 }
-void PrintResult::void DropIndex(bool is_dropped)
+void PrintResult::DropIndex(bool is_dropped)
 {
     if(is_dropped)
     {
