@@ -200,11 +200,13 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
         if (conditions.size() == 0)
         {
             addr_list = tree.AllSearch();
+            std::cout<<"ggg";
         }
         else
         {
             if (found_index)
             {
+                std::cout<<"("<<conditions[idx_cond].op<<")";
                 if (conditions[idx_cond].op == "=")
                 {
                     if (*tree.Search(conditions[idx_cond].value) != FileAddr{0, 0})
@@ -218,9 +220,12 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
                 {
                     addr_list = tree.RightSearch(conditions[idx_cond].value);
                 }
+                else
+                    std::cout<<"Fcuk u";
             }
             else
             {
+                std::cout<<"(all)";
                 addr_list = tree.AllSearch();
             }
         }

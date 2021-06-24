@@ -45,11 +45,11 @@ void Select(string command){
         command = DeleteSpace(command.substr(i + (command[i] == ' ')));
     }
     command = DeleteSpace(command.substr(4));
-    for(i=0; command[i]!=' '; i++) ;
+    for(i=0; command[i]!=' ' && command[i]!=';'; i++) ;
+    char c = command[i];
     table = command.substr(0, i);
     command = DeleteSpace(command.substr(i));
-    std::cout<<"("<<table;
-    if(command.find("where") != std::string::npos){
+    if(c!=';'){
         command = DeleteSpace(command.substr(5));
         while(1)
         {
@@ -61,7 +61,7 @@ void Select(string command){
             command = DeleteSpace(command.substr(i));
             string op = command.substr(0,1);
             if (command[1] == '=') op += "=";
-            command = DeleteSpace(command.substr(1 + (command[1] != '=')));
+            command = DeleteSpace(command.substr(1 + (command[1] == '=')));
             for (i=0; i < command.length() && command[i] != ';'  && command[i] != ',' && command[i] != ' '; i++);
             string value = command.substr(0, i);
             trim(value);
@@ -70,7 +70,8 @@ void Select(string command){
             condition.push_back(tmp);
             if (command[i] == ';') break;
             command = DeleteSpace(command.substr(i+1));
-            if(command.substr(0, 3) != "and")
+            cout<<"("<<command.substr(0,3)<<")";
+            if(command.substr(0, 3) == "and")
                 command = DeleteSpace(command.substr(3));
         }
     }
