@@ -200,15 +200,11 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
         if (conditions.size() == 0)
         {
             addr_list = tree.AllSearch();
-            #ifdef DEBUG
-            std::cout<<"ggg";
-            #endif
         }
         else
         {
             if (found_index)
             {
-                std::cout<<"("<<conditions[idx_cond].op<<")";
                 if (conditions[idx_cond].op == "=")
                 {
                     if (*tree.Search(conditions[idx_cond].value) != FileAddr{0, 0})
@@ -222,8 +218,6 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
                 {
                     addr_list = tree.RightSearch(conditions[idx_cond].value);
                 }
-                else
-                    std::cout<<"Fcuk u";
             }
             else
             {
@@ -233,7 +227,6 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
                 addr_list = tree.AllSearch();
             }
         }
-        std::cout << addr_list.size() << std::endl;
         for (int i = 0; i < addr_list.size(); i++)
         {
             cmp_src = file->ReadRecord(addr_list[i]);
@@ -340,7 +333,7 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
                             i--;//addr_list中存的是指针，tree中删除后，addr_list中也会少
                                                         //若删除的是最后一个，则没有影响
                             addr_list.pop_back();
-                            std::cout << addr_list.size() << std::endl;
+                            //std::cout << addr_list.size() << std::endl;
                         }
                     }
                 }

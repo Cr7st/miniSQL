@@ -13,10 +13,10 @@ DataClass convert(string value){
         else if(value[i] < '0' || value[i] > '9') break;
     DataClass ptr;
     if(value[0] == '\'' && value[value.size()-1] == '\'' || value[0] == '\"' && value[value.size()-1] == '\"')
-        ptr = DataClass(value.substr(1, value.length() - 2)), std::cout<<"a";
-    else if(i==value.length() && n==0) ptr = DataClass(atoi(value.c_str())), std::cout<<"b";
-    else if(n==1) ptr = DataClass(atof(value.c_str())), std::cout<<"c";
-    else ptr = DataClass(value.c_str()), std::cout<<"d";
+        ptr = DataClass(value.substr(1, value.length() - 2));
+    else if(i==value.length() && n==0) ptr = DataClass(atoi(value.c_str()));
+    else if(n==1) ptr = DataClass(atof(value.c_str()));
+    else ptr = DataClass(value.c_str());
     return ptr;
 }
 
@@ -57,7 +57,6 @@ void Select(string command){
                         command[i] != '>'; i++);
             string attr = command.substr(0, i);
             trim(attr);
-            std::cout<<attr;
             command = DeleteSpace(command.substr(i));
             string op = command.substr(0,1);
             if (command[1] == '=') op += "=";
@@ -70,7 +69,6 @@ void Select(string command){
             condition.push_back(tmp);
             if (command[i] == ';') break;
             command = DeleteSpace(command.substr(i+1));
-            cout<<"("<<command.substr(0,3)<<")";
             if(command.substr(0, 3) == "and")
                 command = DeleteSpace(command.substr(3));
         }
@@ -96,7 +94,6 @@ void Insert(string command){
     command = DeleteSpace(command.substr(11));
     for (i = 0; command[i] != ' '; i++);
     table = command.substr(0, i);
-    std::cout<<table;
     /*command = DeleteSpace(command.substr(i+1));
     while(1) {
         for (i = 0; command[i] != ',' && command[i] != ' '&& command[i] != ')'; i++);
@@ -108,7 +105,6 @@ void Insert(string command){
     command = DeleteSpace(command.substr(i+1));
     while(1) {
         for (i = 0; command[i] != ','&& command[i] != ')'; i++);
-        std::cout<<"("+command.substr(0, i)+")";
         DataClass ptr = convert(command.substr(0, i));
         content.push_back(ptr);
         if(command[i] == ')') break;
@@ -155,7 +151,6 @@ void Delete(string command){
                         command[i] != '>'; i++);
             string attr = command.substr(0, i);
             trim(attr);
-            std::cout<<attr;
             command = DeleteSpace(command.substr(i));
             string op = command.substr(0,1);
             if (command[1] == '=') op += "=";
@@ -168,7 +163,6 @@ void Delete(string command){
             condition.push_back(tmp);
             if (command[i] == ';') break;
             command = DeleteSpace(command.substr(i+1));
-            cout<<"("<<command.substr(0,3)<<")";
             if(command.substr(0, 3) == "and")
                 command = DeleteSpace(command.substr(3));
         }
@@ -187,7 +181,6 @@ void Delete(string command){
 void Create(string command){
     int i, j;
     command = DeleteSpace(command.substr(6));
-    //cout<<"gg"<<command<<"11";
     if(command.substr(0, 8)=="database"){
         command = DeleteSpace(command.substr(8));
         for (i = 0; command[i] != ','; i++);
@@ -350,7 +343,6 @@ void PrintResult::InsertTuple(bool is_inserted)
 
 void PrintResult::SelectTuple(std::string table_name, std::vector<Tuple> tuple)
 {
-    std::cout<<tuple.size();
     std::cout<<"====="<<table_name<<"====="<<std::endl;
     TableInfo &table_info = CatalogManager.LookUpTableInfo(table_name);
     if(tuple.size() == 0)
