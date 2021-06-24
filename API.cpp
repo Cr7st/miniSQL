@@ -141,13 +141,10 @@ bool InsertTuple(std::string table_name, std::vector<DataClass> &list)
         return true;
     }
     else
-    {
-        try{
-            throw SQLError::TABLE_ERROR(std::string("There is no such table!  "));
-        }
-        catch(SQLError::TABLE_ERROR e){
-            e.PrintError();
-        }
+    {   
+        std::string e("There is no such table named ");
+        e += table_name;
+        throw SQLError::TABLE_ERROR(e);
         return false;
     }
 }
@@ -203,7 +200,9 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
         if (conditions.size() == 0)
         {
             addr_list = tree.AllSearch();
+            #ifdef DEBUG
             std::cout<<"ggg";
+            #endif
         }
         else
         {
@@ -228,7 +227,9 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
             }
             else
             {
+                #ifdef DEBUG
                 std::cout<<"(all)";
+                #endif
                 addr_list = tree.AllSearch();
             }
         }
@@ -243,15 +244,12 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
     }
     else
     {
+    #ifdef DEBUG
         std::cout<<"noo";
-        try{
-            std::string e("There is no such table named ");
-            e = e + table_name;
-            throw SQLError::TABLE_ERROR(e);
-        }
-        catch(SQLError::TABLE_ERROR e){
-            e.PrintError();
-        }
+    #endif
+        std::string e("There is no such table named ");
+        e = e + table_name;
+        throw SQLError::TABLE_ERROR(e);
     }
 }
 
@@ -356,12 +354,9 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
     }
     else
     {
-        try {
-            throw SQLError::TABLE_ERROR();
-        }
-        catch(SQLError::TABLE_ERROR e){
-            e.PrintError();
-        }
+        std::string e("There is no such table named ");
+        e += table_name;
+        throw SQLError::TABLE_ERROR(e);
     }
 }
 
