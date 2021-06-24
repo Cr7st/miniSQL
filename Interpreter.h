@@ -11,6 +11,12 @@
 #include "GlobalClass.h"
 #include "API.h"
 
+std::string DeleteSpace(std::string a);
+
+void trim(std::string &s);
+
+DataClass convert(std::string value);
+
 void Interpreter(std::string command);
 
 void Insert(std::string command);
@@ -18,9 +24,10 @@ void Insert(std::string command);
 void Select(std::string command);
 
 void Delete(std::string command);
-std::string DeleteSpace(std::string a);
 
-void trim(std::string &s);
+void Create(std::string command);
+
+void Drop(std::string command);
 
 class PrintResult
 {

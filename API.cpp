@@ -218,6 +218,7 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
     }
     else
     {
+        std::cout<<"noo";
         throw SQLError::TABLE_ERROR();
     }
 }

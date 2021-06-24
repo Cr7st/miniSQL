@@ -8,6 +8,10 @@
 #include <cstring>
 
 class Tuple{
+<<<<<<< HEAD
+=======
+friend class PrintResult;
+>>>>>>> 2363b415c47e745679e985e8e547dc3c27e0dd1d
 protected:
     std::vector<DataClass> data_list;
     int tuple_size;
