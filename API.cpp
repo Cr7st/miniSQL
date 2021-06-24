@@ -136,7 +136,12 @@ bool InsertTuple(std::string table_name, std::vector<DataClass> &list)
     }
     else
     {
-        throw SQLError::TABLE_ERROR(std::string("There is no such table!  "));
+        try{
+            throw SQLError::TABLE_ERROR(std::string("There is no such table!  "));
+        }
+        catch(SQLError::TABLE_ERROR e){
+            e.PrintError();
+        }
         return false;
     }
 }
@@ -219,7 +224,12 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
     else
     {
         std::cout<<"noo";
-        throw SQLError::TABLE_ERROR();
+        try{
+            throw SQLError::TABLE_ERROR();
+        }
+        catch(SQLError::TABLE_ERROR e){
+            e.PrintError();
+        }
     }
 }
 
@@ -315,7 +325,12 @@ bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_na
     }
     else
     {
-        throw SQLError::TABLE_ERROR();
+        try {
+            throw SQLError::TABLE_ERROR();
+        }
+        catch(SQLError::TABLE_ERROR e){
+            e.PrintError();
+        }
     }
 }
 
