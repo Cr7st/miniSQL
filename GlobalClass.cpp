@@ -2,21 +2,25 @@
 #include <cstring>
 
 std::ostream& operator<<(std::ostream &out, const DataClass &obj){
-    switch (obj.type)
-    {
-    case DataType::INT:
-        out << obj.data.i;
-        break;
-    case DataType::FLOAT:
-        out << obj.data.f;
-        break;
-    case DataType::CHAR:
-        out << std::string(obj.data.str);
-        break;
-    default:
-        break;
+    if (obj.type == DataType::INT){
+        int i;
+        memcpy(&i, &obj.data, 4);
+        out << i;
+        return out;
     }
-    return out;
+    else if (obj.type == DataType::FLOAT){
+        double f;
+        memcpy(&f, &obj.data, 8);
+        out << f;
+        return out;
+    }
+    else{
+        char s[30];
+        memcpy(s, &obj.data, 30);
+        std::string str(s);
+        out << str;
+        return out;
+    }
 }
 
 

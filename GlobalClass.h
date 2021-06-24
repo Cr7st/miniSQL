@@ -23,8 +23,9 @@ union Data{
 };
 
 class DataClass{
-private:
+public:
     DataType type;
+private:
     int bytes;
     union Data data;
 public:
@@ -40,6 +41,7 @@ public:
     friend std::ostream& operator<<(std::ostream &out, const DataClass &obj);
     friend class Tuple;
     friend class RM;
+    friend class PrintResult;
 };
 
 

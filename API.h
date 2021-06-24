@@ -20,5 +20,5 @@ std::vector<Tuple> SelectTuples(std::vector<SelectCondition> &conditions, std::s
 bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_name);
 bool CreateIndex(std::string table_name, std::string index_name, std::string column_name);
 bool DropIndex(std::string index_name);
-//bool ShowTable(std::string table_name);
+bool ShowTable(std::string table_name);
 #endif

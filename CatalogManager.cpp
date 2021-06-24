@@ -46,8 +46,8 @@ bool CM::NewInfoCheck(TableInfo &table)
 }
 
 
-TableInfo CM::InitTableInfo(std::string table_name, std::vector<std::string> &column_names, 
-                             std::vector<std::string> &data_types, int PK_index)
+TableInfo CM::InitTableInfo(std::string table_name, std::vector<std::string> &column_names,
+                            std::vector<std::string> &data_types, int PK_index)
 {
     if (column_names.size() > 15){
         std::string e("To many attributes!");
@@ -89,6 +89,9 @@ TableInfo CM::InitTableInfo(std::string table_name, std::vector<std::string> &co
             // get the length of char
             std::string str_size = data_types[i].substr(4, data_types[i].length() - 4);
             column.bytes = atoi(str_size.c_str()) * sizeof(char);
+        }
+        else{
+            throw SQLError::TABLE_ERROR("Attribute type error!");
         }
         table.columns.push_back(column);
     }

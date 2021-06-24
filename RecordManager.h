@@ -8,7 +8,6 @@
 #include <cstring>
 
 class Tuple{
-friend class PrintResult;
 protected:
     std::vector<DataClass> data_list;
     int tuple_size;
@@ -47,6 +46,7 @@ public:
     //void WriteToBlock(Block block);
     friend class RM;
     friend bool DeleteTuples(std::vector<SelectCondition> &conditions, std::string table_name);
+    friend class PrintResult;
 };
 
 class RM{ //short for RecordManager
