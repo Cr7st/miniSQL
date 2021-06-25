@@ -211,12 +211,16 @@ void Create(string command){
                 }
             }
             trim(type);
-            types.push_back(type);
             command = DeleteSpace(command.substr(i));
             if(primary == -1 && command.substr(0, 7)=="primary") {
                 primary = j;
                 command = DeleteSpace(command.substr(7));
             }
+            else if(command.substr(0, 6)=="unique") {
+                type = "unique" + type;
+                command = DeleteSpace(command.substr(6));
+            }
+            types.push_back(type);
             if(command[0] == ';') break;
         }
         try{
