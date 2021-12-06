@@ -8,7 +8,7 @@
 #include <cstring>
 
 class Tuple{
-protected:
+private:
     std::vector<DataClass> data_list;
     int tuple_size;
 private:

@@ -22,6 +22,7 @@ void CreateTable(std::string table_name, std::vector<std::string> column_names,
         void *p = GetGlobalFileBuffer()[full_name.c_str()]->ReadWriteRecord(&addr);
         CatalogManager.CreateTable(info, p);
         CreateIndex(table_name, table_name, column_names[PK_index]);
+        std::cout << "Table " + table_name + " successfully created" << std::endl;
     }
 }
 
@@ -96,15 +97,8 @@ bool InsertTuple(std::string table_name, std::vector<DataClass> &list)
             }
             if (info[i].is_unique || info[i].is_PK)
             {
-                // if the column is unique all a primary key, should check duplication
-                if (info[i].is_PK)
-                {
-                    BPTree tree(info.GetIndexName(i));
-                    if (*(tree.Search(list[i])) != FileAddr{0, 0})
-                        throw SQLError::KEY_INSERT_ERROR();
-                }
                 // if the unique attribute has an index, use it to search
-                else if (info[i].has_index)
+                if (info[i].has_index)
                 {
                     BPTree tree(info.GetIndexName(i));
                     if (*(tree.Search(list[i])) != FileAddr{0, 0})
@@ -428,6 +422,7 @@ bool CreateIndex(std::string table_name, std::string index_name, std::string col
         addr.SetFileAddr(0, sizeof(BlockHead) + sizeof(FileHeadInfo) - FILEHI_RESERVE_SPACE);
         void *p = GetGlobalFileBuffer()[tb_full_name.c_str()]->ReadWriteRecord(&addr);
         CatalogManager.WriteTo(table_info, p);
+        std::cout << "Successfully created index " + index_name + "!" << std::endl;
         return true;
     }
     else

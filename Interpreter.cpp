@@ -76,6 +76,7 @@ void Select(string command){
     PrintResult res;
     try {
         std::vector<Tuple> result_set = SelectTuples(condition, table);
+        std::cout << "Retrived " << result_set.size() << " tuples" << std::endl;
         res.SelectTuple(table, result_set);
     }
     catch(SQLError::TABLE_ERROR e){
@@ -211,12 +212,16 @@ void Create(string command){
                 }
             }
             trim(type);
-            types.push_back(type);
             command = DeleteSpace(command.substr(i));
             if(primary == -1 && command.substr(0, 7)=="primary") {
                 primary = j;
                 command = DeleteSpace(command.substr(7));
             }
+            else if (command.substr(0, 6) == "unique"){
+                type = "unique" + type;
+                command = DeleteSpace(command.substr(6));
+            }
+            types.push_back(type);
             if(command[0] == ';') break;
         }
         try{
@@ -236,11 +241,11 @@ void Create(string command){
         command = DeleteSpace(command.substr(i));
         if(command.substr(0,2)=="on"){
             command = DeleteSpace(command.substr(2));
-            for (i = 0; command[i] != ' ' && command[i] != ')'; i++);
+            for (i = 0; command[i] != ' ' && command[i] != '('; i++);
             string table = command.substr(0, i);
-            for (j = 0; command[j] == ' ' || command[j] == '('; j++);
-            for (i = j; command[i] != ' ' && command[i] != ')'; i++);
-            string column = command.substr(i, j);
+            command = DeleteSpace(command.substr(i + 1));
+            for (i = 0; command[i] != ' ' && command[i] != ')'; i++);
+            string column = command.substr(0, i);
             try{
                 CreateIndex(table, index, column);
             }

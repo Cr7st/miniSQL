@@ -52,7 +52,7 @@ void Run()
             command.erase(0, 8);
             file_name = command.erase(command.length() - 1);
             FileGetCommand(file_name);
-            cout << "file closed" << endl;
+            cout << "File closed" << endl;
         }
         else{
             #ifdef TIME_MEASURE
